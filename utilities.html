@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Rocket's Megasphere - Utilities</title>
+
+    <style>
+        /* Local font: Orbitron file lives in the website root directory */
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('Orbitron-VariableFont_wght.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #000000;
+            color: #F60;
+            font-family: Tahoma, Geneva, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation Menu */
+        nav {
+            width: 250px;
+            background-color: #1a0000;
+            border-right: 2px solid #880000;
+            padding: 20px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto; /* lets the menu scroll if the window is short */
+        }
+        nav ul { list-style: none; }
+        nav ul li { margin-bottom: 15px; }
+        nav ul li a {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: bold;
+            display: block;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            transition: all 0.15s ease-in-out;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            color: #ffffff;
+            border: 1px solid #ff0000;
+            background-color: transparent;
+        }
+
+        /* "Links" heading (not clickable) and the outside links under it */
+        .nav-heading {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-bottom: 1px dashed #880000;
+        }
+        nav ul.sub-links { margin-top: 8px; }
+        nav ul.sub-links li { margin-bottom: 6px; }
+        nav ul.sub-links li a {
+            font-size: 0.8rem;
+            padding: 6px 12px 6px 24px;
+        }
+
+        /* Main Content Frame */
+        main {
+            flex-grow: 1;
+            padding: 40px;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        header { flex-shrink: 0; }
+        header h1 {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #220000;
+        }
+        .subtitle-bar {
+            height: 3px;
+            background: linear-gradient(to right, #ff0000, #F60, transparent);
+            margin-bottom: 30px;
+        }
+
+        /* Scrollable Content Box Only */
+        .scroll-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .scroll-box::-webkit-scrollbar { width: 8px; }
+        .scroll-box::-webkit-scrollbar-track { background: #000000; }
+        .scroll-box::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
+        .scroll-box::-webkit-scrollbar-thumb:hover { background: #ff0000; }
+
+        /* Footer Box */
+        .bottom-header {
+            margin-top: auto;
+            padding: 15px;
+            border: 1px solid #1a0000;
+            background-color: #0b0b0b;
+            text-align: right;
+            font-size: 0.54rem;
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            letter-spacing: 1px;
+        }
+        .bottom-header a {
+            color: #FF4500;
+            text-decoration: underline;
+            transition: color 0.15s ease-in-out;
+        }
+        .bottom-header a:hover { color: #ffffff; }
+
+        /* Card Grid Layout */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 280px);
+            gap: 50px;
+            margin-bottom: 20px;
+        }
+        .category-title {
+            grid-column: 1 / -1;
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #1a0000;
+            padding-bottom: 8px;
+        }
+        .map-card {
+            background-color: #0b0b0b;
+            border: 1px solid #1a0000;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-card img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #880000;
+            margin-bottom: 15px;
+            transition: border-color 0.15s ease-in-out, filter 0.15s ease-in-out;
+        }
+        .map-card img:hover {
+            cursor: pointer;
+            border-color: #ff0000;
+            filter: brightness(1.1);
+        }
+        .map-title {
+            color: #ffffff;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .map-desc {
+            color: #CCC;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        .download-btn {
+            color: #FF4500;
+            text-decoration: underline;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: color 0.15s ease-in-out;
+        }
+        .download-btn:hover { color: #ffffff; }
+        .DownloadText { font-weight: bold; color: #CCC; }
+        .horizontal-divider {
+            grid-column: 1 / -1;
+            border: none;
+            height: 3px;
+            background: linear-gradient(to right, #ff0000, #F60, transparent);
+            margin: 30px 0;
+        }
+
+        /* Utilities page: centered text */
+        .scroll-box { text-align: center; }
+        .scroll-box p { color: #CCC; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            nav { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #880000; }
+            main { padding: 20px; height: auto; }
+            .scroll-box { overflow-y: visible; padding-right: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .map-grid { grid-template-columns: 1fr; }
+            .category-title, .horizontal-divider { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Main Page</a></li>
+            <li><a href="maps.html">Doom Maps</a></li>
+            <li><a href="utilities.html" class="active">Utilities</a></li>
+            <li>
+                <div class="nav-heading">Links</div>
+                <ul class="sub-links">
+                    <li><a href="https://www.doomworld.com/" target="_blank" rel="noopener">Doomworld</a></li>
+                    <li><a href="https://www.doomworld.com/idgames/" target="_blank" rel="noopener">idgames Archive</a></li>
+                    <li><a href="https://zdoom.org/" target="_blank" rel="noopener">ZDoom</a></li>
+                    <li><a href="https://doomwiki.org/" target="_blank" rel="noopener">Doom Wiki</a></li>
+                    <li><a href="https://qcde.net/" target="_blank" rel="noopener">QCDE</a></li>
+                    <li><a href="https://www.doomworld.com/cacowards/" target="_blank" rel="noopener">Cacowards</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Frame -->
+    <main>
+        <header>
+            <h1>Programs | Utilities</h1>
+            <div class="subtitle-bar"></div>
+        </header>
+
+        <!-- Only elements inside this div will scroll -->
+        <div class="scroll-box">
+
+            <p>Here we have some small programs and utilities I've made in hopes of making life a little easier when working with random source port engines, etc.</p>
+            <p>Hopefully you'll find them useful too!</p>
+            <p>&nbsp;</p>
+
+            <div class="map-grid">
+
+                <div class="map-card">
+                    <div class="map-title">Legacy Launcher 2</div>
+                    <div class="map-desc">The old Doom Legacy Launcher 1.x lost its way some time back in the XP days and later became somewhat incompatible when trying to load PWADs and such. Because of this, and noticing the recent development activity with the Doom Legacy engine, I decided the launcher needed a bit of attention. So I made a new one. I give you: Doom Legacy Launcher 2! A modern Windows launcher built for the Doom Legacy source engine, designed to make setting up, hosting, and joining games as simple as possible. Doom Legacy Launcher 2 handles engine setup, IWAD/PWAD management, network hosting and joining, IWAD/addon integrity verification, and more, all wrapped in an interface inspired by the Doom Legacy website theme.</div>
+                    <p><span class="DownloadText">Want more info?</span></p>
+                    <p><span class="DownloadText">Visit the:</span></p>
+                    <p><a href="https://mrrocket.github.io/DoomLegacyLauncher2" target="_blank" class="download-btn">Doom Legacy Launcher 2 site</a></p>
+                </div>
+                <div class="map-card">
+                    <div class="map-title">Managed-Doom Launcher</div>
+                    <div class="map-desc">A simple launcher for the Managed-Doom source engine. The Addons tab area of the launcher has the ability to remember previously loaded PWAD and Deh locations, so you can quickly select what you want to load from History. Also supports drag 'n' drop.</div>
+                    <a href="Images/managed-doom-launcher_shot1.png" target="_blank"><img src="Images/managed-doom-launcher_shot1.png" alt="Managed-Doom Launcher Preview"></a>
+                    <p>&nbsp;</p>
+                    <p><span class="DownloadText">Visit the:</span></p>
+                    <p><a href="https://github.com/MrRocket/Managed-Doom_Launcher" target="_blank" class="download-btn">Managed-Doom Launcher site</a></p>
+                </div>
+                <div class="map-card">
+                    <div class="map-title">Quick Launcher</div>
+                    <div class="map-desc">Quick Launcher is just what it says it is. No bells, no whistles. But a really quick way to load or test your map or mod with just about any source engine. Because it doesn't have any combo box selections and such, it requires that the user already knows which command parameters to type in the textbox at the bottom of the utility, e.g. +map or -warp, depending on the source engine loaded.</div>
+                    <a href="Images/quick_launcher_shot.png" target="_blank"><img src="Images/quick_launcher_shot.png" alt="Quick Launcher Preview"></a>
+                    <p>&nbsp;</p>
+                    <p><span class="DownloadText">Download:</span></p>
+                    <p><a href="Files/quick_launcher.zip" target="_blank" class="download-btn">quick_launcher.zip</a></p>
+                </div>
+                <div class="map-card">
+                    <div class="map-title">File List Exporter</div>
+                    <div class="map-desc">File List Exporter is a really small utility to simply export the file names in a given directory to a .txt file called file_list.txt. This can come in handy if you have, for example, a bunch of images and you want to make an animation script for a project, where the outputted text file will end up with a list of all the image names, so you won't need to type them all out manually.</div>
+                    <a href="Images/file_list_exporter_shot.png" target="_blank"><img src="Images/file_list_exporter_shot.png" alt="File List Exporter Preview"></a>
+                    <p>&nbsp;</p>
+                    <p><span class="DownloadText">Download:</span></p>
+                    <p><a href="Files/FileListExporter.zip" target="_blank" class="download-btn">FileListExporter.zip</a></p>
+                </div>
+            </div>
+
+            <footer class="bottom-header">
+                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://fonts.google.com/specimen/Orbitron" target="_blank">Matt McInerney</a></span>
+            </footer>
+
+        </div>
+    </main>
+
+</body>
+</html>

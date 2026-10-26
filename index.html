@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Rocket's Megasphere</title>
+
+    <style>
+        /* Local font: Orbitron file lives in the website root directory */
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('Orbitron-VariableFont_wght.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #000000;
+            color: #F60;
+            font-family: Tahoma, Geneva, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation Menu */
+        nav {
+            width: 250px;
+            background-color: #1a0000;
+            border-right: 2px solid #880000;
+            padding: 20px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto; /* lets the menu scroll if the window is short */
+        }
+        nav ul { list-style: none; }
+        nav ul li { margin-bottom: 15px; }
+        nav ul li a {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: bold;
+            display: block;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            transition: all 0.15s ease-in-out;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            color: #ffffff;
+            border: 1px solid #ff0000;
+            background-color: transparent;
+        }
+
+        /* "Links" heading (not clickable) and the outside links under it */
+        .nav-heading {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-bottom: 1px dashed #880000;
+        }
+        nav ul.sub-links { margin-top: 8px; }
+        nav ul.sub-links li { margin-bottom: 6px; }
+        nav ul.sub-links li a {
+            font-size: 0.8rem;
+            padding: 6px 12px 6px 24px;
+        }
+
+        /* Main Content Frame */
+        main {
+            flex-grow: 1;
+            padding: 40px;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        header { flex-shrink: 0; }
+        header h1 {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #220000;
+        }
+        .subtitle-bar {
+            height: 3px;
+            background: linear-gradient(to right, #ff0000, #F60, transparent);
+            margin-bottom: 30px;
+        }
+
+        /* Scrollable Content Box Only */
+        .scroll-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .scroll-box::-webkit-scrollbar { width: 8px; }
+        .scroll-box::-webkit-scrollbar-track { background: #000000; }
+        .scroll-box::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
+        .scroll-box::-webkit-scrollbar-thumb:hover { background: #ff0000; }
+
+        /* Footer Box */
+        .bottom-header {
+            margin-top: auto;
+            padding: 15px;
+            border: 1px solid #1a0000;
+            background-color: #0b0b0b;
+            text-align: right;
+            font-size: 0.54rem;
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            letter-spacing: 1px;
+        }
+        .bottom-header a {
+            color: #FF4500;
+            text-decoration: underline;
+            transition: color 0.15s ease-in-out;
+        }
+        .bottom-header a:hover { color: #ffffff; }
+
+        .content { flex-grow: 1; }
+        p { font-size: 1.1rem; margin-bottom: 20px; }
+        p.tight-p { margin-bottom: 2px; }
+        .highlight { color: #ffffff; font-weight: bold; }
+        .bottom-header { margin-top: 40px; }
+        .scroll-box .content {
+            color: #CCC;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            nav { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #880000; }
+            main { padding: 20px; height: auto; }
+            .scroll-box { overflow-y: visible; padding-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav>
+        <ul>
+            <li><a href="index.html" class="active">Main Page</a></li>
+            <li><a href="maps.html">Doom Maps</a></li>
+            <li><a href="utilities.html">Utilities</a></li>
+            <li>
+                <div class="nav-heading">Links</div>
+                <ul class="sub-links">
+                    <li><a href="https://www.doomworld.com/" target="_blank" rel="noopener">Doomworld</a></li>
+                    <li><a href="https://www.doomworld.com/idgames/" target="_blank" rel="noopener">idgames Archive</a></li>
+                    <li><a href="https://zdoom.org/" target="_blank" rel="noopener">ZDoom</a></li>
+                    <li><a href="https://doomwiki.org/" target="_blank" rel="noopener">Doom Wiki</a></li>
+                    <li><a href="https://qcde.net/" target="_blank" rel="noopener">QCDE</a></li>
+                    <li><a href="https://www.doomworld.com/cacowards/" target="_blank" rel="noopener">Cacowards</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Frame -->
+    <main>
+        <header>
+            <h1>Mr.Rocket's Megasphere</h1>
+            <div class="subtitle-bar"></div>
+        </header>
+
+        <!-- Only elements inside this div will scroll -->
+        <div class="scroll-box">
+
+            <section class="content">
+                <p class="tight-p">You found Mr.Rocket's Megasphere!</p>
+                <p class="tight-p">&nbsp;</p>
+                <p class="tight-p">This is where I upload my recent Doom maps, programs, and utilities.</p>
+                <p class="tight-p">Navigate the menu on the left to find what you're looking for and above all, enjoy your stay!</p>
+                <p>&nbsp;</p>
+        <!-- Only elements inside this div will scroll -->
+        <div class="scroll-box">
+
+            <div class="map-grid">
+
+                <h2 class="category-title">Current Project</h2>
+                <div class="map-card">
+                    <a href="Images/HL2_Lockdown_DM_QCDE.png" target="_blank"><img src="Images/HL2_Lockdown_DM_QCDE.png" alt="HL2 Lockdown Dev Preview"></a>
+                    <div class="map-title">Half-Life 2 Lockdown Remake</div>
+                    <div class="map-desc">I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. It's getting there!</div>
+            </section>
+
+            <footer class="bottom-header">
+                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://fonts.google.com/specimen/Orbitron" target="_blank">Matt McInerney</a></span>
+            </footer>
+
+        </div>
+    </main>
+
+</body>
+</html>

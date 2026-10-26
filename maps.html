@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Rocket's Megasphere - Maps</title>
+
+    <style>
+        /* Local font: Orbitron file lives in the website root directory */
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('Orbitron-VariableFont_wght.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #000000;
+            color: #F60;
+            font-family: Tahoma, Geneva, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation Menu */
+        nav {
+            width: 250px;
+            background-color: #1a0000;
+            border-right: 2px solid #880000;
+            padding: 20px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto; /* lets the menu scroll if the window is short */
+        }
+        nav ul { list-style: none; }
+        nav ul li { margin-bottom: 15px; }
+        nav ul li a {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: bold;
+            display: block;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            transition: all 0.15s ease-in-out;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            color: #ffffff;
+            border: 1px solid #ff0000;
+            background-color: transparent;
+        }
+
+        /* "Links" heading (not clickable) and the outside links under it */
+        .nav-heading {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-bottom: 1px dashed #880000;
+        }
+        nav ul.sub-links { margin-top: 8px; }
+        nav ul.sub-links li { margin-bottom: 6px; }
+        nav ul.sub-links li a {
+            font-size: 0.8rem;
+            padding: 6px 12px 6px 24px;
+        }
+
+        /* Main Content Frame */
+        main {
+            flex-grow: 1;
+            padding: 40px;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        header { flex-shrink: 0; }
+        header h1 {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #220000;
+        }
+        .subtitle-bar {
+            height: 3px;
+            background: linear-gradient(to right, #ff0000, #F60, transparent);
+            margin-bottom: 30px;
+        }
+
+        /* Scrollable Content Box Only */
+        .scroll-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .scroll-box::-webkit-scrollbar { width: 8px; }
+        .scroll-box::-webkit-scrollbar-track { background: #000000; }
+        .scroll-box::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
+        .scroll-box::-webkit-scrollbar-thumb:hover { background: #ff0000; }
+
+        /* Footer Box */
+        .bottom-header {
+            margin-top: auto;
+            padding: 15px;
+            border: 1px solid #1a0000;
+            background-color: #0b0b0b;
+            text-align: right;
+            font-size: 0.54rem;
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            letter-spacing: 1px;
+        }
+        .bottom-header a {
+            color: #FF4500;
+            text-decoration: underline;
+            transition: color 0.15s ease-in-out;
+        }
+        .bottom-header a:hover { color: #ffffff; }
+
+        /* Card Grid Layout */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 280px);
+            gap: 50px;
+            margin-bottom: 20px;
+        }
+        .category-title {
+            grid-column: 1 / -1;
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #1a0000;
+            padding-bottom: 8px;
+        }
+        .map-card {
+            background-color: #0b0b0b;
+            border: 1px solid #1a0000;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-card img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #880000;
+            margin-bottom: 15px;
+            transition: border-color 0.15s ease-in-out, filter 0.15s ease-in-out;
+        }
+        .map-card img:hover {
+            cursor: pointer;
+            border-color: #ff0000;
+            filter: brightness(1.1);
+        }
+        .map-title {
+            color: #ffffff;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .map-desc {
+            color: #CCC;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        .download-btn {
+            color: #FF4500;
+            text-decoration: underline;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: color 0.15s ease-in-out;
+        }
+        .download-btn:hover { color: #ffffff; }
+        .DownloadText { font-weight: bold; color: #CCC; }
+        .horizontal-divider {
+            grid-column: 1 / -1;
+            border: none;
+            height: 3px;
+            background: linear-gradient(to right, #ff0000, #F60, transparent);
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            nav { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #880000; }
+            main { padding: 20px; height: auto; }
+            .scroll-box { overflow-y: visible; padding-right: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .map-grid { grid-template-columns: 1fr; }
+            .category-title, .horizontal-divider { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Main Page</a></li>
+            <li><a href="maps.html" class="active">Doom Maps</a></li>
+            <li><a href="utilities.html">Utilities</a></li>
+            <li>
+                <div class="nav-heading">Links</div>
+                <ul class="sub-links">
+                    <li><a href="https://www.doomworld.com/" target="_blank" rel="noopener">Doomworld</a></li>
+                    <li><a href="https://www.doomworld.com/idgames/" target="_blank" rel="noopener">idgames Archive</a></li>
+                    <li><a href="https://zdoom.org/" target="_blank" rel="noopener">ZDoom</a></li>
+                    <li><a href="https://doomwiki.org/" target="_blank" rel="noopener">Doom Wiki</a></li>
+                    <li><a href="https://qcde.net/" target="_blank" rel="noopener">QCDE</a></li>
+                    <li><a href="https://www.doomworld.com/cacowards/" target="_blank" rel="noopener">Cacowards</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Frame -->
+    <main>
+        <header>
+            <h1>Maps</h1>
+            <div class="subtitle-bar"></div>
+        </header>
+
+        <!-- Only elements inside this div will scroll -->
+        <div class="scroll-box">
+
+            <div class="map-grid">
+
+                <h2 class="category-title">Most Recent Maps</h2>
+                <div class="map-card">
+                    <a href="Images/TheProvingGrounds.png" target="_blank"><img src="Images/TheProvingGrounds.png" alt="The Proving Grounds Preview"></a>
+                    <div class="map-title">QCDL13 - The Proving Grounds</div>
+                    <div class="map-desc">The Proving Grounds is a Quake3 remake map I made for QCDE a couple of years ago. To play the map you must have QCDE installed. Just load the mod and browse for QCDL13 in the Duel section of the map list in QCDE. If you don't have QCDE, it can be downloaded here:</div>
+                    <p><span class="DownloadText">Download</span> <a href="https://qcde.net/" target="_blank" class="download-btn">QCDE</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/Lea.png" target="_blank"><img src="Images/Lea.png" alt="Lea Preview"></a>
+                    <div class="map-title">QCDE23 - Lea</div>
+                    <div class="map-desc">Lea is a map remake of an Unreal 2 Tournament map I made for QCDE about a year or so ago? To play the map you must have QCDE installed. Just load the mod and browse for QCDE23 in the General section of the map list in QCDE. If you don't have QCDE, it can be downloaded here:</div>
+                    <p><span class="DownloadText">Download</span> <a href="https://qcde.net/" target="_blank" class="download-btn">QCDE</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/TheLongestYard.png" target="_blank"><img src="Images/TheLongestYard.png" alt="The Longest Yard Preview"></a>
+                    <div class="map-title">QCME01 - The Longest Yard</div>
+                    <div class="map-desc">The Longest Yard is a remake map of the original Quake Champions map for QCDE I made a few years ago, which in retrospect was also based on the original Q3 map with the same name. To play the map you must have QCDE installed. Just load the mod and browse for QCME01 in the Meme section of the map list in QCDE. If you don't have QCDE, it can be downloaded here:</div>
+                    <p><span class="DownloadText">Download</span> <a href="https://qcde.net/" target="_blank" class="download-btn">QCDE</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/QCDE47_Claustrophobopolis.png" target="_blank"><img src="Images/QCDE47_Claustrophobopolis.png" alt="Claustrophobopolis Preview"></a>
+                    <div class="map-title">QCDE47 - Claustrophobopolis</div>
+                    <div class="map-desc">Claustrophobopolis is a remake map of the original Quake map for QCDE I made some years ago now. To play the map you must have QCDE installed. Just load the mod and browse for QCDE47 in the General section of the map list in QCDE. If you don't have QCDE, it can be downloaded here:</div>
+                    <p><span class="DownloadText">Download</span> <a href="https://qcde.net/" target="_blank" class="download-btn">QCDE</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/QCDL07_TheDarkZone.png" target="_blank"><img src="Images/QCDL07_TheDarkZone.png" alt="The Dark Zone Preview"></a>
+                    <div class="map-title">QCDL07 - The Dark Zone</div>
+                    <div class="map-desc">The Dark Zone is a remake map of the original Quake map for QCDE I made more than a few years ago. To play the map you must have QCDE installed. Just load the mod and browse for QCDL07 in the Duel section of the map list in QCDE. If you don't have QCDE, it can be downloaded here:</div>
+                    <p><span class="DownloadText">Download</span> <a href="https://qcde.net/" target="_blank" class="download-btn">QCDE</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/QCDL01_TheBadPlace.png" target="_blank"><img src="Images/QCDL01_TheBadPlace.png" alt="The Bad Place Preview"></a>
+                    <div class="map-title">QCDL01 - The Bad Place</div>
+                    <div class="map-desc">The Bad Place is a remake map of the original Quake map for QCDE I made several years ago. To play the map you must have QCDE installed. Just load the mod and browse for QCDL01 in the Duel section of the map list in QCDE. If you don't have QCDE, it can be downloaded here:</div>
+                    <p><span class="DownloadText">Download</span> <a href="https://qcde.net/" target="_blank" class="download-btn">QCDE</a></p>
+                </div>
+
+                <hr class="horizontal-divider">
+
+                <h2 class="category-title">Older Stuff</h2>
+                <div class="map-card">
+                    <a href="Images/E2M3_DaJaVu.png" target="_blank"><img src="Images/E2M3_DaJaVu.png" alt="E2M3 DaJaVu Preview"></a>
+                    <div class="map-title">DaJaVu</div>
+                    <div class="map-desc">DaJaVu is the 1st Deathmatch level for Ultimate Doom I built for the community-driven megawad called Ultimate TWANGO. Compiled by OpenRift in 2021, the megawad is comprised of all 4 episodes and 9 levels per episode, replacing all levels in Ultimate Doom with DM maps. DaJaVu replaces E2M3. The reason I decided to call it DaJaVu is because it looks ridiculously similar to the original Ultimate Doom level that it replaces.</div>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/E2M6_ODamn.png" target="_blank"><img src="Images/E2M6_ODamn.png" alt="E2M6 O'Damn Preview"></a>
+                    <div class="map-title">O' Damn</div>
+                    <div class="map-desc">O' Damn is the 2nd Deathmatch level for Ultimate Doom I built for the same community-driven megawad, Ultimate TWANGO. Compiled by OpenRift in 2021, the megawad is comprised of all 4 episodes and 9 levels per episode, replacing all levels in Ultimate Doom with DM maps. O' Damn replaces E2M6. I took the liberty of uploading the megawad here.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/UTWANGO.WAD" class="download-btn">UTWANGO.WAD</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/MRTWANGO.png" target="_blank"><img src="Images/MRTWANGO.png" alt="Mr.Twango Preview"></a>
+                    <div class="map-title">MRTWANGO</div>
+                    <div class="map-desc">MRTWANGO is a Doom2 DM level I made for the community-driven megawad called TWANGO1, which was compiled by OpenRift in 2021. MRTWANGO is a 2-4 player level and replaces MAP02 of Doom2.</div>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/MRCRUNCHY.png" target="_blank"><img src="Images/MRCRUNCHY.png" alt="Mr.Crunchy Preview"></a>
+                    <div class="map-title">MRCRUNCHY</div>
+                    <div class="map-desc">MRCRUNCHY is another Doom2 DM level I made for the community-driven megawad called TWANGO1, which was compiled by OpenRift in 2021. MRCRUNCHY is also a 2-4 player level and replaces MAP22 of Doom2. I took the liberty of uploading the TWANGO1 megawad here.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/TWANGO1.WAD" class="download-btn">TWANGO1.WAD</a></p>
+                </div>
+
+                <hr class="horizontal-divider">
+
+                <h2 class="category-title">Even Older Stuff</h2>
+                <h2 class="category-title">Doom Legacy Maps</h2>
+                <div class="map-card">
+                    <a href="Images/MRPD3D.png" target="_blank"><img src="Images/MRPD3D.png" alt="Plexeydome 3D Preview"></a>
+                    <div class="map-title">MRPD3D.wad</div>
+                    <div class="map-desc">Plexeydome 3D is a single 1-5 player &quot;3D FLOORS&quot; map for DM or co-op play (preferably DM), USING THE LATEST VERSION OF DOOM2.WAD and DOOMLEGACY with SOFTWARE, 3DFX or GL modes.. heh, I made this back in 2001 and it should run fine on other source ports that support 3D floors in OpenGL modes.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/MRPD3D.wad" class="download-btn">MRPD3D.wad</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/MRQ3DM17.png" target="_blank"><img src="Images/MRQ3DM17.png" alt="MRQ3DM17 Preview"></a>
+                    <div class="map-title">MRQ3DM17.wad</div>
+                    <div class="map-desc">MRQ3DM17.wad is a single level remake of the Quake3 DM level titled &quot;The Longest Yard&quot; for Doom Legacy. I made this level back in 2003 and it was probably one of the first real Q3 remakes for a Doom sourceport that had functional jump pads. Uses Dehacked to simulate the rail gun. The level may not run correctly on newer builds of Doom Legacy, however it is kept here for historical reasons.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/MRQ3DM17.wad" class="download-btn">MRQ3DM17.wad</a></p>
+                </div>
+
+                <hr class="horizontal-divider">
+
+                <h2 class="category-title">Old School Megawads</h2>
+                <div class="map-card">
+                    <a href="Images/mega5.png" target="_blank"><img src="Images/mega5.png" alt="Mega5 Preview"></a>
+                    <div class="map-title">Mega5.wad</div>
+                    <div class="map-desc">Mega5 is an Old Skool style Deathmatch megawad made for the Doom II game, and just about any Doom source engine. Includes 22 deathmatch maps! I compiled Mega5 back in 2011. All levels are new from the Doom community, 10 of which I made as well.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/mega5.wad" class="download-btn">mega5.wad</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/mega4.png" target="_blank"><img src="Images/mega4.png" alt="Mega4 Preview"></a>
+                    <div class="map-title">Mega4.wad</div>
+                    <div class="map-desc">Mega 4 is 29 of the best Deathmatch levels, compiled just for you. Aren't you special. This 4 Megabyte WAD includes all new music, sound effects, and some cool new graphics. I compiled Mega4 back in 2006. It only has a handful of new maps added to it in that era. Most maps are from Dwango and Dweller.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/mega4.wad" class="download-btn">mega4.wad</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/mega3.png" target="_blank"><img src="Images/mega3.png" alt="Mega3 Preview"></a>
+                    <div class="map-title">Mega3.wad</div>
+                    <div class="map-desc">Mega 3 was compiled in the late 90s. Who compiled it is unknown and there was never a readme file for the wad. Either way, the megawad consists of 32 levels for Doom2 which are mostly Dwango and Dweller maps, and a few custom maps.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/mega3.wad" class="download-btn">mega3.wad</a></p>
+                </div>
+                <div class="map-card">
+                    <a href="Images/mega2.png" target="_blank"><img src="Images/mega2.png" alt="Mega2 Preview"></a>
+                    <div class="map-title">Mega2.wad</div>
+                    <div class="map-desc">Megawad 2 is 30 of the best Deathmatch levels in the world. Some of which are also Deathtag levels. View the readme file for more info. Mega2 was compiled back in 1996 by Adam Pedersen and Martin Cox.</div>
+                    <p><span class="DownloadText">Download</span> <a href="Files/mega2.wad" class="download-btn">mega2.wad</a></p>
+                </div>
+            </div>
+
+            <footer class="bottom-header">
+                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://fonts.google.com/specimen/Orbitron" target="_blank">Matt McInerney</a></span>
+            </footer>
+
+        </div>
+    </main>
+
+</body>
+</html>
