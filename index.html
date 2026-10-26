@@ -110,7 +110,7 @@
 
         /* Footer Box */
         .bottom-header {
-            margin-top: auto;
+            margin-top: 40px;
             padding: 15px;
             border: 1px solid #1a0000;
             background-color: #0b0b0b;
@@ -127,15 +127,91 @@
         }
         .bottom-header a:hover { color: #ffffff; }
 
-        .content { flex-grow: 1; }
+        /* Page body: intro text, Current Project, Chat */
+        .page-body { flex-grow: 1; }
         p { font-size: 1.1rem; margin-bottom: 20px; }
         p.tight-p { margin-bottom: 2px; }
         .highlight { color: #ffffff; font-weight: bold; }
-        .bottom-header { margin-top: 40px; }
         .scroll-box .content {
             color: #CCC;
             font-family: 'MyCustomFont', sans-serif;
             font-size: 12px;
+        }
+
+        .category-title {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #1a0000;
+            padding-bottom: 8px;
+        }
+        .project-grid {
+            display: grid;
+            grid-template-columns: 280px;
+            margin-bottom: 20px;
+        }
+        .map-card {
+            background-color: #0b0b0b;
+            border: 1px solid #1a0000;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-card img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #880000;
+            margin-bottom: 15px;
+            transition: border-color 0.15s ease-in-out, filter 0.15s ease-in-out;
+        }
+        .map-card img:hover {
+            cursor: pointer;
+            border-color: #ff0000;
+            filter: brightness(1.1);
+        }
+        .map-title {
+            color: #ffffff;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .map-desc {
+            color: #CCC;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        /* Chat box */
+        .chat-frame {
+            max-width: 610px;
+            background-color: #0b0b0b;
+            border: 1px solid #880000;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .chat-intro {
+            color: #CCC;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        .chat-frame iframe {
+            display: block;
+            width: 100%;
+            height: 420px;
+            border: 1px solid #1a0000;
+            background-color: #0b0b0b;
+        }
+        .chat-placeholder {
+            border: 1px dashed #880000;
+            padding: 30px 15px;
+            text-align: center;
+            color: #888;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 0.85rem;
         }
 
         @media (max-width: 768px) {
@@ -143,6 +219,8 @@
             nav { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #880000; }
             main { padding: 20px; height: auto; }
             .scroll-box { overflow-y: visible; padding-right: 0; }
+            .project-grid { grid-template-columns: 1fr; }
+            .chat-frame iframe { height: 380px; }
         }
     </style>
 </head>
@@ -178,23 +256,36 @@
         <!-- Only elements inside this div will scroll -->
         <div class="scroll-box">
 
-            <section class="content">
-                <p class="tight-p">You found Mr.Rocket's Megasphere!</p>
-                <p class="tight-p">&nbsp;</p>
-                <p class="tight-p">This is where I upload my recent Doom maps, programs, and utilities.</p>
-                <p class="tight-p">Navigate the menu on the left to find what you're looking for and above all, enjoy your stay!</p>
-                <p>&nbsp;</p>
-        <!-- Only elements inside this div will scroll -->
-        <div class="scroll-box">
+            <div class="page-body">
 
-            <div class="map-grid">
+                <section class="content">
+                    <p class="tight-p">You found Mr.Rocket's Megasphere!</p>
+                    <p class="tight-p">&nbsp;</p>
+                    <p class="tight-p">This is where I upload my recent Doom maps, programs, and utilities.</p>
+                    <p class="tight-p">Navigate the menu on the left to find what you're looking for and above all, enjoy your stay!</p>
+                    <p>&nbsp;</p>
+                </section>
 
-                <h2 class="category-title">Current Project</h2>
-                <div class="map-card">
-                    <a href="Images/HL2_Lockdown_DM_QCDE.png" target="_blank"><img src="Images/HL2_Lockdown_DM_QCDE.png" alt="HL2 Lockdown Dev Preview"></a>
-                    <div class="map-title">Half-Life 2 Lockdown Remake</div>
-                    <div class="map-desc">I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. It's getting there!</div>
-            </section>
+                <section class="project">
+                    <h2 class="category-title">Current Project</h2>
+                    <div class="project-grid">
+                        <div class="map-card">
+                            <a href="Images/HL2_Lockdown_DM_QCDE.png" target="_blank"><img src="Images/HL2_Lockdown_DM_QCDE.png" alt="HL2 Lockdown Dev Preview"></a>
+                            <div class="map-title">Half-Life 2 Lockdown Remake</div>
+                            <div class="map-desc">I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. It's getting there!</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="chat">
+                    <h2 class="category-title">Chat</h2>
+                    <div class="chat-frame">
+                        <p class="chat-intro">Say hi! Pick a name and leave a message.</p>
+                        <div id="cbox-holder"></div>
+                    </div>
+                </section>
+
+            </div>
 
             <footer class="bottom-header">
                 Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://fonts.google.com/specimen/Orbitron" target="_blank">Matt McInerney</a></span>
@@ -202,6 +293,24 @@
 
         </div>
     </main>
+
+    <script>
+
+        const CBOX_SRC = "https://www3.cbox.ws/box/?boxid=3561691&boxtag=8K4QvR";
+
+        const holder = document.getElementById("cbox-holder");
+        if (CBOX_SRC) {
+            const frame = document.createElement("iframe");
+            frame.src = CBOX_SRC;
+            frame.title = "Megasphere chat";
+            frame.loading = "lazy";
+            frame.setAttribute("frameborder", "0");
+            frame.setAttribute("allow", "autoplay");
+            holder.appendChild(frame);
+        } else {
+            holder.innerHTML = '<div class="chat-placeholder">Chat coming soon</div>';
+        }
+    </script>
 
 </body>
 </html>
