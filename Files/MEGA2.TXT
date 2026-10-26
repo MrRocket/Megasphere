@@ -1,0 +1,130 @@
+----------------------------------------------------------------------------
+                             M E G A W A D   2 
+----------------------------------------------------------------------------
+
+Megawad 2 is 30 of the best Deathmatch levels in the world, compiled just
+for you.  Aren't you special.  This 4 Megabyte WAD includes all new music,
+sound effects, and some cool new graphics.  The levels are divided into 3
+sections, so you can easily "-warp" to any of the levels when you are
+starting a deathmatch.  Levels 1-14 are fast deathmatch levels, 15-24 are
+just some of the AWESOME levels made by Megasphere members, and 25-30 are
+special levels and team games.
+
+These levels are designed to be played in new deathmatch mode "-altdeath"
+In many levels, using a different skill level will change the types of
+weapons on the level.
+
+IMPORTANT: See "Rules.TXT" for info on how to play the team games!
+The text files we could find for included levels are in "TEXTS.ZIP".
+
+MEGAWAD 2 DESIGNERS
+-------------------
+Adam Pedersen and Martin Cox
+
+THANKS TO
+---------
+Splash,Namu1
+
+WHERE TO GET THIS AND MORE OF THE BEST WADS
+-------------------------------------------
+
+         M E G A S P H E R E (tm)
+
+This is the Official Deathmatch WAD of the
+MegaSphere Online Service.  We are the BEST
+place in Indiana for multi-player gaming,
+including Doom, Quake, Duke Nukem 3D, C&C,
+Warcraft and more!
+
+  MAIN LINE : (317)273-9666 -> 14.4 baud
+  FILE XFERS: (317)273-9694 -> 28.8 baud
+
+----------------------------------------------------------------------------
+
+  ีอออออออัออออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออธ
+  ณ Map # ณ WAD          ณ AUTHOR                            DESCRIPTION ณ
+  ฦอออออออุออออออออออออออุอออออออออออออออออออออออออออออออออออออออออออออออต
+  ณ   1   ณ AE_TUPS  #9  ณ Eric Sambach     "The Ulimate Power Struggle" ณ
+  ณ   2   ณ AE_TUPS  #31 ณ                                               ณ
+  ณ   3   ณ (UNKNOWN)    ณ                                               ณ
+  ณ   4   ณ DWELLER1 #6  ณ The Dweller in the Cellar          "Dweller1" ณ
+  ณ   5   ณ (UNKNOWN)    ณ                                               ณ
+  ณ   6   ณ AE_TUPS  #4  ณ                                               ณ
+  ณ   7   ณ TIMJAY   #4  ณ Tim Ash & Jason Kirby                "TimJay" ณ
+  ณ   8   ณ VORTPAK  #4  ณ johnh@tamu.edu              "VorTeX Series 1" ณ
+  ณ   9   ณ KANDY        ณ Kandyman                              "Kandy" ณ
+  ณ   10  ณ OVERKIL2     ณ Milo Casali                      "Overkill 2" ณ
+  ณ   11  ณ WESTDETH     ณ Scott Smith                                   ณ
+  ณ   12  ณ PEACE-D2     ณ W. Grassl & C. Hellmann    "Peace for Doom 2" ณ
+  ณ   13  ณ DANDY02      ณ Lachlan Stewart          "Dandy Deathmatch 2" ณ
+  ณ   14  ณ SMPFRAG      ณ                                               ณ
+  ณ-------ณ--------------ณ----- LEVELS CREATED BY MEGASPHERE MEMBERS ----ณ
+  ณ   15  ณ MEGAMAP5     ณ Darkwing                          "Megamap 5" ณ
+  ณ   16  ณ STONEHNG     ณ Darkwing                        "Stone Henge" ณ
+  ณ   17  ณ KICK1        ณ Kicker                      "Watch Your Back" ณ
+  ณ   18  ณ NOCHEAP!     ณ Darkwing                    "NO Cheap Frags!" ณ
+  ณ   19  ณ SLICK04      ณ Slick                 "Vince-- Opus 4 rev. B" ณ
+  ณ   20  ณ GAMBLER      ณ Draggon                             "Gambler" ณ
+  ณ   21  ณ GRUVIN       ณ Gruvin                    "Gruvin" (modified) ณ
+  ณ   22  ณ TOMGOFLY     ณ Tomgofly                           "Tomgofly" ณ
+  ณ   23  ณ DTHVILLA     ณ Demon Eater                  "Villa of Death" ณ
+  ณ   24  ณ QUAKEDM      ณ Demon Eater                     "Quake Test1" ณ
+  ณ-------ณ--------------ณ--------- SPECIAL LEVELS & TEAM GAMES ---------ณ
+  ณ   25  ณ MAPTEST2     ณ Kandyman                        "Quake Test2" ณ
+  ณ   26  ณ MOUNTKNG #1  ณ Paradox & Undertow       "Mountain King v2.0" ณ
+  ณ   27  ณ MOUNTKNG #2  ณ                                               ณ
+  ณ   28  ณ MTAG         ณ Talon & Aikman    "Mega Tag" (mod. Death Tag) ณ
+  ณ   29  ณ JUDAS22      ณ Brian Vannatta                     "Judas 22" ณ
+  ณ   30  ณ DOGTAG2      ณ MrBlonde                  "Reservior Dog Tag" ณ
+  ิอออออออฯออออออออออออออฯอออออออออออออออออออออออออออออออออออออออออออออออพ
+
+  ีออออออออออออออออออออออออออออธ
+  ณ    MEGAWAD 2 STATISTICS    ณ
+  ฦออออออออออออออออออออออออออออต
+  ณ Level Data:         2,400K ณ
+  ณ Graphics:             950K ณ
+  ณ Sounds:               400K ณ
+  ณ Music:                550K ณ
+  ณ Misc:                 120K ณ
+  ณ Assembly time:    65 hours ณ
+  ณ Levels rejected:       110 ณ
+  ณ Windows 95 lockups:    30+ ณ
+  ณ Beta versions:           5 ณ
+  ณ Tools used:                ณ
+  ณ  NewWadTool (damn buggy),  ณ
+  ณ  Photoshop,Paint Shop Pro, ณ
+  ณ  Deluxe Paint,Sound Forge, ณ
+  ณ  Midi2Mus,MusTool,DCK,     ณ
+  ณ  DMapEdit,Inkworks         ณ
+  ภฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤู
+
+----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Buy Jetpack (tm)
