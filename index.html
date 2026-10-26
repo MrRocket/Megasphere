@@ -148,11 +148,12 @@
             border-bottom: 1px solid #1a0000;
             padding-bottom: 8px;
         }
-        .project-grid {
-            display: grid;
-            grid-template-columns: 280px;
-            margin-bottom: 20px;
-        }
+			.project-grid {
+    		display: grid;
+    		grid-template-columns: 1fr;
+    		max-width: 610px;
+    		margin-bottom: 20px;
+			}
         .map-card {
             background-color: #0b0b0b;
             border: 1px solid #1a0000;
@@ -201,7 +202,7 @@
         .chat-frame iframe {
             display: block;
             width: 100%;
-            height: 420px;
+            height: 279px;
             border: 1px solid #1a0000;
             background-color: #0b0b0b;
         }
@@ -272,7 +273,10 @@
                         <div class="map-card">
                             <a href="Images/HL2_Lockdown_DM_QCDE.png" target="_blank"><img src="Images/HL2_Lockdown_DM_QCDE.png" alt="HL2 Lockdown Dev Preview"></a>
                             <div class="map-title">Half-Life 2 Lockdown Remake</div>
-                            <div class="map-desc">I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. It's getting there!</div>
+                            <div class="map-desc">
+                              <p>I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. </p>
+                              <p>It's getting there!</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -280,7 +284,7 @@
                 <section class="chat">
                     <h2 class="category-title">Chat</h2>
                     <div class="chat-frame">
-                        <p class="chat-intro">Say hi! Pick a name and leave a message.</p>
+                        <p class="chat-intro"></p>
                         <div id="cbox-holder"></div>
                     </div>
                 </section>
@@ -304,7 +308,7 @@
             frame.src = CBOX_SRC;
             frame.title = "Megasphere chat";
             frame.loading = "lazy";
-            frame.setAttribute("frameborder", "0");
+            frame.setAttribute("frameborder", "3");
             frame.setAttribute("allow", "autoplay");
             holder.appendChild(frame);
         } else {
