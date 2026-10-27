@@ -626,19 +626,27 @@ onAuthStateChanged(auth, async (user) => {
 		const usersList = document.getElementById("chat-users-list");
 		
 		onValue(presenceRef, (snap) => {
-		
-			const users = [];
-		
-			snap.forEach((child) => {
-				users.push(child.val().name);
-			});
-		
-			users.sort((a, b) => a.localeCompare(b));
-		
-			usersList.innerHTML = users.length
-				? users.join("<br>")
-				: "Nobody online";
-		});
+
+    console.log("PRESENCE UPDATE");
+    console.log(snap.val());
+
+    const users = [];
+
+    snap.forEach((child) => {
+
+        console.log(child.key, child.val());
+
+        if (child.val() && child.val().name) {
+            users.push(child.val().name);
+        }
+    });
+
+    users.sort((a, b) => a.localeCompare(b));
+
+    usersList.innerHTML = users.length
+        ? users.join("<br>")
+        : "Nobody online";
+});
 
 
     uid = user.uid;
