@@ -94,6 +94,7 @@
             background: linear-gradient(to right, #ff0000, #F60, transparent);
             margin-bottom: 30px;
         }
+
         /* Scrollable Content Box Only */
         .scroll-box {
             flex-grow: 1;
@@ -215,7 +216,7 @@
         }
         .chat-btn:hover { color: #ffffff; border-color: #ff0000; }
         .chat-messages {
-            height: 160px;
+            height: 260px;
             overflow-y: auto;
             background-color: #000000;
             border: 1px solid #1a0000;
@@ -242,6 +243,7 @@
             outline: none;
         }
         .chat-form input:focus { border-color: #ff0000; }
+        .chat-form input[readonly] { color: #ff0000; border-color: #1a0000; cursor: default; font-weight: bold; }
         #chat-name { width: 130px; }
         #chat-text { flex: 1; min-width: 150px; }
         .chat-status { color: #888; font-size: 0.75rem; margin-top: 8px; min-height: 1.2em; }
@@ -275,19 +277,18 @@
             <li>
                 <div class="nav-heading">Links</div>
                 <ul class="sub-links">
-                    <li><a href="https://github.io" target="_blank" rel="noopener">Ultimate Doom Builder</a></li>
-                    <li><a href="https://doomworld.com" target="_blank" rel="noopener">Doomworld</a></li>
-                    <li><a href="https://doomworld.comidgames/" target="_blank" rel="noopener">idgames Archive</a></li>
-                    <li><a href="https://zdoom.org" target="_blank" rel="noopener">ZDoom Wiki</a></li>
-                    <li><a href="https://doomwiki.org" target="_blank" rel="noopener">Doom Wiki</a></li>
-                    <li><a href="https://qcde.net" target="_blank" rel="noopener">QCDE</a></li>
+                    <li><a href="https://ultimatedoombuilder.github.io/" target="_blank" rel="noopener">Ultimate Doom Builder</a></li>
+                    <li><a href="https://www.doomworld.com/" target="_blank" rel="noopener">Doomworld</a></li>
+                    <li><a href="https://www.doomworld.com/idgames/" target="_blank" rel="noopener">idgames Archive</a></li>
+                    <li><a href="https://zdoom.org/wiki/Main_Page" target="_blank" rel="noopener">ZDoom Wiki</a></li>
+                    <li><a href="https://doomwiki.org/" target="_blank" rel="noopener">Doom Wiki</a></li>
+                    <li><a href="https://qcde.net/" target="_blank" rel="noopener">QCDE</a></li>
                 </ul>
             </li>
         </ul>
     </nav>
 
     <!-- Main Content Frame -->
-       <!-- Main Content Frame -->
     <main>
         <header>
             <h1>Mr.Rocket's Megasphere</h1>
@@ -322,7 +323,7 @@
                     <h2 class="category-title">Chat</h2>
                     <div class="chat-frame">
                         <div class="chat-top">
-                            <p class="chat-intro"></p>
+                            <p class="chat-intro">Say hi! Pick a name and leave a message.</p>
                             <button type="button" id="chat-mute" class="chat-btn">Sound: On</button>
                         </div>
                         <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
@@ -338,7 +339,7 @@
             </div>
 
             <footer class="bottom-header">
-                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://google.com" target="_blank">Matt McInerney</a></span>
+                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://fonts.google.com/specimen/Orbitron" target="_blank">Matt McInerney</a></span>
             </footer>
 
         </div>
@@ -346,10 +347,7 @@
 
     <script type="module">
         /* ======================================================================
-           CHAT SETUP: replace each PASTE... value below with your own Firebase
-           values (Project settings > Your apps > Web app > Config).
-           databaseURL comes from Build > Realtime Database.
-           Leave them as-is and the page shows "Chat coming soon" instead.
+           CHAT SETUP: your Firebase project values.
            ====================================================================== */
         const firebaseConfig = {
             apiKey: "AIzaSyAmtFU6spppxSwTRWiqs7bXTnOsa-GlG0I",
@@ -362,24 +360,23 @@
         const SOUND_FILE = "pop.wav";   // put pop.wav in the same folder as index.html
         const MAX_MESSAGES = 50;        // how many recent messages to show
         const COOLDOWN_MS = 3000;       // minimum time between a visitor's messages
+        const NAME_PATTERN = /^[A-Za-z0-9_-]{2,20}$/;
 
         const frame = document.querySelector(".chat-frame");
 
         function store(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
         function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
 
-         async function startChat() {
+        async function startChat() {
             const V = "10.14.1";
-            
-            // Fixed the typo in this URL string:
-            const { initializeApp } = await import(`https://gstatic.com{V}/firebase-app.js`);
-            
-            // This one is already correct:
-            const { getDatabase, ref, push, query, limitToLast, onValue, serverTimestamp, get, set } =
-                await import(`https://gstatic.com{V}/firebase-database.js`);
+            const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+            const { getAuth, signInAnonymously } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+            const { getDatabase, ref, push, set, get, query, limitToLast, onValue, serverTimestamp } =
+                await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
 
-            const db = getDatabase(initializeApp(firebaseConfig));
-
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getDatabase(app);
             const messagesRef = ref(db, "messages");
 
             const box = document.getElementById("chat-messages");
@@ -389,18 +386,8 @@
             const muteBtn = document.getElementById("chat-mute");
             const status = document.getElementById("chat-status");
 
-            nameIn.value = load("chatName") || "";
-
-            // 2. Generate or load a unique User ID for this browser session
-            let userId = load("chatUserId");
-            if (!userId) {
-                userId = "user_" + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-                store("chatUserId", userId);
-            }
-
             /* Sound */
             const pop = new Audio(SOUND_FILE);
-
             pop.volume = 0.5;
             let muted = load("chatMuted") === "1";
             function updateMute() { muteBtn.textContent = muted ? "Sound: Off" : "Sound: On"; }
@@ -413,7 +400,7 @@
             function playPop() {
                 if (muted) return;
                 pop.currentTime = 0;
-                pop.play().catch(() => {});
+                pop.play().catch(() => {}); // browsers block sound until the visitor has clicked/typed on the page
             }
 
             function formatTime(ts) {
@@ -424,7 +411,7 @@
                     : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + time;
             }
 
-            /* Show messages (with secure URL handling) */
+            /* Show messages (textContent only, so nobody can inject HTML) */
             let first = true;
             let lastId = null;
             const q = query(messagesRef, limitToLast(MAX_MESSAGES));
@@ -449,22 +436,8 @@
                     const time = document.createElement("span");
                     time.className = "chat-time";
                     time.textContent = m.ts ? formatTime(m.ts) : "";
-                    
                     const text = document.createElement("div");
-                    const escapedText = m.text
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;")
-                        .replace(/'/g, "&#039;");
-
-                    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-                    const linkedText = escapedText.replace(urlRegex, (url) => {
-                        const href = url.startsWith('www.') ? `https://${url}` : url;
-                        return `<a href="${href}" target="_blank" rel="noopener" style="color: #FF4500; text-decoration: underline;">${url}</a>`;
-                    });
-
-                    text.innerHTML = linkedText;
+                    text.textContent = m.text;
                     row.append(name, time, text);
                     box.appendChild(row);
                 });
@@ -478,41 +451,70 @@
                 status.textContent = "Couldn't load the chat right now.";
             });
 
+            /* Identity: each browser gets a private anonymous ID, and a name
+               can be claimed once. The rules in Firebase enforce this. */
+            let uid = null;
+            let myName = null;
+            let ready = false;
+            const HINT = "Your name is locked to this browser after your first message.";
+
+            function lockName(name) {
+                myName = name;
+                nameIn.value = name;
+                nameIn.readOnly = true;
+                status.textContent = "";
+            }
+
+            status.textContent = "Connecting...";
+            signInAnonymously(auth).then(async (cred) => {
+                uid = cred.user.uid;
+                try {
+                    const snap = await get(ref(db, "users/" + uid));
+                    if (snap.exists()) lockName(snap.val());
+                } catch (e) { /* no saved name yet */ }
+                ready = true;
+                if (!myName) status.textContent = HINT;
+                else status.textContent = "";
+            }).catch(() => {
+                status.textContent = "Chat sign-in isn't available right now, so posting is disabled.";
+            });
+
             /* Send */
             let lastSent = 0;
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
-                const name = nameIn.value.trim().slice(0, 20);
+                if (!ready) {
+                    status.textContent = "Still connecting, try again in a moment.";
+                    return;
+                }
                 const text = textIn.value.trim().slice(0, 300);
-                if (!name || !text) return;
+                if (!text) return;
                 if (Date.now() - lastSent < COOLDOWN_MS) {
                     status.textContent = "Slow down a sec...";
                     return;
                 }
-                
-                status.textContent = "Checking name availability...";
-                
-                try {
-                    // Check if anyone owns this name in the database
-                    const nameSnapshot = await get(ref(db, `names/${name}`));
-                    
-                    if (nameSnapshot.exists()) {
-                        const ownerId = nameSnapshot.val();
-                        // If the name is claimed by a different browser ID, block them
-                        if (ownerId !== userId) {
-                            status.textContent = "This name is already taken by someone else!";
-                            return;
-                        }
-                    } else {
-                        // If nobody owns it yet, claim it for this browser session
-                        await set(ref(db, `names/${name}`), userId);
+
+                /* First message: claim the name */
+                if (!myName) {
+                    const wanted = nameIn.value.trim();
+                    if (!NAME_PATTERN.test(wanted)) {
+                        status.textContent = "Names can use letters, numbers, _ and - (2 to 20 characters).";
+                        return;
                     }
-                    
-                    // Name check passed! Send the message
-                    lastSent = Date.now();
-                    await push(messagesRef, { name, text, ts: serverTimestamp() });
+                    try {
+                        await set(ref(db, "names/" + wanted.toLowerCase()), uid);
+                        await set(ref(db, "users/" + uid), wanted);
+                        lockName(wanted);
+                    } catch (err) {
+                        status.textContent = "That name is taken or not allowed. Try another.";
+                        return;
+                    }
+                }
+
+                lastSent = Date.now();
+                try {
+                    await push(messagesRef, { name: myName, uid: uid, text: text, ts: serverTimestamp() });
                     textIn.value = "";
-                    store("chatName", name);
                     status.textContent = "";
                 } catch (err) {
                     status.textContent = "Couldn't send your message. Please try again.";
@@ -520,15 +522,10 @@
             });
         }
 
-              if (JSON.stringify(firebaseConfig).includes("PASTE")) {
-            frame.innerHTML = '<div class="chat-placeholder">Chat coming soon</div>';
-        } else {
-            startChat().catch((error) => {
-                // This will print the exact, raw error message into your chat box
-                frame.innerHTML = `<div class="chat-placeholder" style="color: #ff0000; text-align: left; font-family: monospace; font-size: 11px; white-space: pre-wrap; overflow-x: auto;">Chat Error Details:\n${error.stack || error.message || error}</div>`;
-            });
-        }
-
+        startChat().catch(() => {
+            frame.innerHTML = '<div class="chat-placeholder">Chat is unavailable right now</div>';
+        });
     </script>
+
 </body>
 </html>
