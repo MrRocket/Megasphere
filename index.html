@@ -94,7 +94,6 @@
             background: linear-gradient(to right, #ff0000, #F60, transparent);
             margin-bottom: 30px;
         }
-
         /* Scrollable Content Box Only */
         .scroll-box {
             flex-grow: 1;
@@ -276,12 +275,12 @@
             <li>
                 <div class="nav-heading">Links</div>
                 <ul class="sub-links">
-                    <li><a href="https://ultimatedoombuilder.github.io/" target="_blank" rel="noopener">Ultimate Doom Builder</a></li>
-                    <li><a href="https://www.doomworld.com/" target="_blank" rel="noopener">Doomworld</a></li>
-                    <li><a href="https://www.doomworld.com/idgames/" target="_blank" rel="noopener">idgames Archive</a></li>
-                    <li><a href="https://zdoom.org/wiki/Main_Page" target="_blank" rel="noopener">ZDoom Wiki</a></li>
-                    <li><a href="https://doomwiki.org/" target="_blank" rel="noopener">Doom Wiki</a></li>
-                    <li><a href="https://qcde.net/" target="_blank" rel="noopener">QCDE</a></li>
+                    <li><a href="https://github.io" target="_blank" rel="noopener">Ultimate Doom Builder</a></li>
+                    <li><a href="https://doomworld.com" target="_blank" rel="noopener">Doomworld</a></li>
+                    <li><a href="https://doomworld.comidgames/" target="_blank" rel="noopener">idgames Archive</a></li>
+                    <li><a href="https://zdoom.org" target="_blank" rel="noopener">ZDoom Wiki</a></li>
+                    <li><a href="https://doomwiki.org" target="_blank" rel="noopener">Doom Wiki</a></li>
+                    <li><a href="https://qcde.net" target="_blank" rel="noopener">QCDE</a></li>
                 </ul>
             </li>
         </ul>
@@ -338,12 +337,11 @@
             </div>
 
             <footer class="bottom-header">
-                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://fonts.google.com/specimen/Orbitron" target="_blank">Matt McInerney</a></span>
+                Created by Ron Goode aka Mr.Rocket 2026 ~ Orbitron font created by <span><a href="https://google.com" target="_blank">Matt McInerney</a></span>
             </footer>
 
         </div>
     </main>
-
     <script type="module">
         /* ======================================================================
            CHAT SETUP: replace each PASTE... value below with your own Firebase
@@ -370,9 +368,11 @@
 
         async function startChat() {
             const V = "10.14.1";
-            const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
-            const { getDatabase, ref, push, query, limitToLast, onValue, serverTimestamp } =
-                await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
+            const { initializeApp } = await import(`https://gstatic.com{V}/firebase-app.js`);
+            
+            // Fixed CDN endpoints here
+            const { getDatabase, ref, push, query, limitToLast, onValue, serverTimestamp, get, set } =
+                await import(`https://gstatic.com{V}/firebase-database.js`);
 
             const db = getDatabase(initializeApp(firebaseConfig));
             const messagesRef = ref(db, "messages");
@@ -385,6 +385,13 @@
             const status = document.getElementById("chat-status");
 
             nameIn.value = load("chatName") || "";
+
+            // Unique browser session token generated/loaded here
+            let userId = load("chatUserId");
+            if (!userId) {
+                userId = "user_" + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+                store("chatUserId", userId);
+            }
 
             /* Sound */
             const pop = new Audio(SOUND_FILE);
@@ -400,7 +407,7 @@
             function playPop() {
                 if (muted) return;
                 pop.currentTime = 0;
-                pop.play().catch(() => {}); // browsers block sound until the visitor has clicked/typed on the page
+                pop.play().catch(() => {});
             }
 
             function formatTime(ts) {
@@ -411,7 +418,7 @@
                     : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + time;
             }
 
-            /* Show messages (textContent only, so nobody can inject HTML) */
+            /* Show messages (with secure URL handling) */
             let first = true;
             let lastId = null;
             const q = query(messagesRef, limitToLast(MAX_MESSAGES));
@@ -436,31 +443,23 @@
                     const time = document.createElement("span");
                     time.className = "chat-time";
                     time.textContent = m.ts ? formatTime(m.ts) : "";
-const text = document.createElement("div");
+                    
+                    const text = document.createElement("div");
+                    const escapedText = m.text
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
 
-// 1. Escape the plain text first to completely prevent HTML/XSS injection
-const escapedText = m.text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+                    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+                    const linkedText = escapedText.replace(urlRegex, (url) => {
+                        const href = url.startsWith('www.') ? `https://${url}` : url;
+                        return `<a href="${href}" target="_blank" rel="noopener" style="color: #FF4500; text-decoration: underline;">${url}</a>`;
+                    });
 
-// 2. Regex to detect URLs starting with http://, https://, or www.
-const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-
-// 3. Convert detected URLs into clickable HTML anchor tags
-const linkedText = escapedText.replace(urlRegex, (url) => {
-    // If the URL matches 'www.', prepend 'https://' so the link navigates away properly
-    const href = url.startsWith('www.') ? `https://${url}` : url;
-    return `<a href="${href}" target="_blank" rel="noopener" style="color: #FF4500; text-decoration: underline;">${url}</a>`;
-});
-
-// 4. Safely insert the newly generated HTML structure
-text.innerHTML = linkedText;
-
-row.append(name, time, text);
-
+                    text.innerHTML = linkedText;
+                    row.append(name, time, text);
                     box.appendChild(row);
                 });
                 if (first || nearBottom) box.scrollTop = box.scrollHeight;
@@ -484,8 +483,27 @@ row.append(name, time, text);
                     status.textContent = "Slow down a sec...";
                     return;
                 }
-                lastSent = Date.now();
+                
+                status.textContent = "Checking name availability...";
+                
                 try {
+                    // Check if anyone owns this name in the database
+                    const nameSnapshot = await get(ref(db, `names/${name}`));
+                    
+                    if (nameSnapshot.exists()) {
+                        const ownerId = nameSnapshot.val();
+                        // If the name is claimed by a different browser ID, block them
+                        if (ownerId !== userId) {
+                            status.textContent = "This name is already taken by someone else!";
+                            return;
+                        }
+                    } else {
+                        // If nobody owns it yet, claim it for this browser session
+                        await set(ref(db, `names/${name}`), userId);
+                    }
+                    
+                    // Name check passed! Send the message
+                    lastSent = Date.now();
                     await push(messagesRef, { name, text, ts: serverTimestamp() });
                     textIn.value = "";
                     store("chatName", name);
@@ -504,6 +522,5 @@ row.append(name, time, text);
             });
         }
     </script>
-
 </body>
 </html>
