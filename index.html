@@ -436,9 +436,31 @@
                     const time = document.createElement("span");
                     time.className = "chat-time";
                     time.textContent = m.ts ? formatTime(m.ts) : "";
-                    const text = document.createElement("div");
-                    text.textContent = m.text;
-                    row.append(name, time, text);
+const text = document.createElement("div");
+
+// 1. Escape the plain text first to completely prevent HTML/XSS injection
+const escapedText = m.text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+// 2. Regex to detect URLs starting with http://, https://, or www.
+const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+
+// 3. Convert detected URLs into clickable HTML anchor tags
+const linkedText = escapedText.replace(urlRegex, (url) => {
+    // If the URL matches 'www.', prepend 'https://' so the link navigates away properly
+    const href = url.startsWith('www.') ? `https://${url}` : url;
+    return `<a href="${href}" target="_blank" rel="noopener" style="color: #FF4500; text-decoration: underline;">${url}</a>`;
+});
+
+// 4. Safely insert the newly generated HTML structure
+text.innerHTML = linkedText;
+
+row.append(name, time, text);
+
                     box.appendChild(row);
                 });
                 if (first || nearBottom) box.scrollTop = box.scrollHeight;
