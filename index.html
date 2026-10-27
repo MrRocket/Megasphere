@@ -368,11 +368,11 @@
         function store(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
         function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
 
-        async function startChat() {
+               async function startChat() {
             const V = "10.14.1";
             const { initializeApp } = await import(`https://gstatic.com{V}/firebase-app.js`);
             
-            // Fixed CDN endpoints here
+            // 1. All necessary variables are imported cleanly right here
             const { getDatabase, ref, push, query, limitToLast, onValue, serverTimestamp, get, set } =
                 await import(`https://gstatic.com{V}/firebase-database.js`);
 
@@ -388,7 +388,7 @@
 
             nameIn.value = load("chatName") || "";
 
-            // Unique browser session token generated/loaded here
+            // 2. Generate or load a unique User ID for this browser session
             let userId = load("chatUserId");
             if (!userId) {
                 userId = "user_" + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
@@ -397,6 +397,7 @@
 
             /* Sound */
             const pop = new Audio(SOUND_FILE);
+
             pop.volume = 0.5;
             let muted = load("chatMuted") === "1";
             function updateMute() { muteBtn.textContent = muted ? "Sound: Off" : "Sound: On"; }
