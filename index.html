@@ -26,16 +26,26 @@
             overflow: hidden;
         }
 
-        /* Sidebar Navigation Menu */
-        nav {
-            width: 250px;
-            background-color: #1a0000;
-            border-right: 2px solid #880000;
-            padding: 20px;
-            flex-shrink: 0;
-            height: 100%;
-            overflow-y: auto; /* lets the menu scroll if the window is short */
-        }
+        /* Sidebar Navigation Menu ~ added a fire animation to the menu background*/
+nav {
+    width: 250px;
+    background:
+        linear-gradient(
+            rgba(0,0,0,0.50),
+            rgba(0,0,0,0.50)
+        ),
+        url('Images/fire.gif');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-right: 2px solid #880000;
+    padding: 20px;
+    flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+}
         nav ul { list-style: none; }
         nav ul li { margin-bottom: 15px; }
         nav ul li a {
