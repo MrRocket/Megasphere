@@ -467,6 +467,31 @@ nav {
             const textIn = document.getElementById("chat-text");
             const muteBtn = document.getElementById("chat-mute");
             const status = document.getElementById("chat-status");
+			
+			const usersList = document.getElementById("chat-users-list");
+
+onValue(presenceRef, (snap) => {
+
+    console.log("PRESENCE UPDATE", snap.val());
+
+    const users = [];
+
+    snap.forEach((child) => {
+
+        const data = child.val();
+
+        if (data && data.name) {
+            users.push(data.name);
+        }
+    });
+
+    users.sort((a, b) => a.localeCompare(b));
+
+    usersList.innerHTML =
+        users.length > 0
+            ? users.join("<br>")
+            : "Nobody online";
+});
 
             /* Sound */
             const pop = new Audio(SOUND_FILE);
@@ -623,30 +648,7 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
-		const usersList = document.getElementById("chat-users-list");
-		
-		onValue(presenceRef, (snap) => {
 
-    console.log("PRESENCE UPDATE");
-    console.log(snap.val());
-
-    const users = [];
-
-    snap.forEach((child) => {
-
-        console.log(child.key, child.val());
-
-        if (child.val() && child.val().name) {
-            users.push(child.val().name);
-        }
-    });
-
-    users.sort((a, b) => a.localeCompare(b));
-
-    usersList.innerHTML = users.length
-        ? users.join("<br>")
-        : "Nobody online";
-});
 
 
     uid = user.uid;
