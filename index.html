@@ -26,7 +26,7 @@
             overflow: hidden;
         }
 
-        /* Sidebar Navigation Menu ~ added a fire animation to the menu background*/
+        /* Sidebar Navigation Menu */
 nav {
     width: 250px;
     background:
@@ -264,7 +264,18 @@ nav {
             color: #888;
             font-family: 'MyCustomFont', sans-serif;
             font-size: 0.85rem;
+			
+			
         }
+		
+				.chat-msg a {
+			color: #FF4500;
+			text-decoration: underline;
+		}
+		
+		.chat-msg a:hover {
+			color: #FFFFFF;
+		}
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
@@ -334,7 +345,7 @@ nav {
                     <div class="chat-frame">
                     <div class="chat-top">
     <p class="chat-intro">
-    Logging in with Google will reserve your username.
+    Sign in with Google to reserve your username permanently.
 </p>
 
     <div style="display:flex;gap:8px;">
@@ -443,8 +454,44 @@ nav {
                     ? time
                     : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + time;
             }
+			
+			
+			
 
-            /* Show messages (textContent only, so nobody can inject HTML) */
+            /* Show messages (also inject HTML links) */
+			
+			function createMessageContent(message) {
+    const container = document.createElement("div");
+
+    const urlRegex = /(https?:\/\/[^\s]+)/gi;
+
+    let lastIndex = 0;
+    let match;
+
+    while ((match = urlRegex.exec(message)) !== null) {
+
+        const before = message.substring(lastIndex, match.index);
+        if (before)
+            container.appendChild(document.createTextNode(before));
+
+        const a = document.createElement("a");
+        a.href = match[0];
+        a.textContent = match[0];
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+
+        container.appendChild(a);
+
+        lastIndex = match.index + match[0].length;
+    }
+
+    const remainder = message.substring(lastIndex);
+    if (remainder)
+        container.appendChild(document.createTextNode(remainder));
+
+    return container;
+}
+			
             let first = true;
             let lastId = null;
             const q = query(messagesRef, limitToLast(MAX_MESSAGES));
@@ -469,8 +516,7 @@ nav {
                     const time = document.createElement("span");
                     time.className = "chat-time";
                     time.textContent = m.ts ? formatTime(m.ts) : "";
-                    const text = document.createElement("div");
-                    text.textContent = m.text;
+					const text = createMessageContent(m.text);
                     row.append(name, time, text);
                     box.appendChild(row);
                 });
