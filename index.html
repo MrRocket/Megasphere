@@ -276,6 +276,24 @@ nav {
 		.chat-msg a:hover {
 			color: #FFFFFF;
 		}
+		
+				.chat-users {
+			background-color: #000000;
+			border: 1px solid #1a0000;
+			padding: 8px;
+			margin-bottom: 12px;
+			font-size: 0.8rem;
+		}
+		
+		.chat-users-title {
+			color: #ff0000;
+			font-family: 'MyCustomFont', sans-serif;
+			margin-bottom: 6px;
+		}
+		
+		#chat-users-list {
+			color: #CCC;
+		}
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
@@ -362,7 +380,14 @@ nav {
         </button>
     </div>
 </div>
-                        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+
+
+                        <div id="chat-users" class="chat-users">
+                        <div class="chat-users-title">Online Users</div>
+                        <div id="chat-users-list">Nobody online</div>
+                    </div>
+                    
+                    <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
                         <form id="chat-form" class="chat-form" autocomplete="off">
                             <input id="chat-name" type="text" maxlength="20" placeholder="Name" required>
                             <input id="chat-text" type="text" maxlength="300" placeholder="Message" required>
@@ -415,13 +440,26 @@ nav {
 } = await import(
     `https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`
 );
-            const { getDatabase, ref, push, set, get, query, limitToLast, onValue, serverTimestamp } =
-                await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
+           const {
+					getDatabase,
+					ref,
+					push,
+					set,
+					get,
+					query,
+					limitToLast,
+					onValue,
+					serverTimestamp,
+					onDisconnect,
+					remove
+				} = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
 
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getDatabase(app);
             const messagesRef = ref(db, "messages");
+			const presenceRef = ref(db, "presence");
+
 
             const box = document.getElementById("chat-messages");
             const form = document.getElementById("chat-form");
@@ -585,26 +623,55 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
+		const usersList = document.getElementById("chat-users-list");
+		
+		onValue(presenceRef, (snap) => {
+		
+			const users = [];
+		
+			snap.forEach((child) => {
+				users.push(child.val().name);
+			});
+		
+			users.sort((a, b) => a.localeCompare(b));
+		
+			usersList.innerHTML = users.length
+				? users.join("<br>")
+				: "Nobody online";
+		});
+
+
     uid = user.uid;
-
-    try {
-        const snap = await get(ref(db, "users/" + uid));
-
-        if (snap.exists()) {
-            lockName(snap.val());
-        }
-    }
-    catch (err) {
-        console.error(err);
-    }
-
-    ready = true;
-
-    if (!myName)
-        status.textContent = HINT;
-    else
-        status.textContent = "";
-});
+	const myPresenceRef = ref(db, "presence/" + uid);
+	
+	await set(myPresenceRef, {
+		uid: uid,
+		name: user.displayName || "Unknown"
+	});
+	
+	onDisconnect(myPresenceRef).remove();
+		try {
+			const snap = await get(ref(db, "users/" + uid));
+	
+			if (snap.exists()) {
+				lockName(snap.val());
+				await set(myPresenceRef, {
+					uid: uid,
+					name: snap.val()
+				});
+			}
+		}
+		catch (err) {
+			console.error(err);
+		}
+	
+		ready = true;
+	
+		if (!myName)
+			status.textContent = HINT;
+		else
+			status.textContent = "";
+	});
 
             /* Send */
             let lastSent = 0;
