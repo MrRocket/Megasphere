@@ -148,12 +148,12 @@
             border-bottom: 1px solid #1a0000;
             padding-bottom: 8px;
         }
-			.project-grid {
-    		display: grid;
-    		grid-template-columns: 1fr;
-    		max-width: 610px;
-    		margin-bottom: 20px;
-			}
+        .project-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            max-width: 610px;
+            margin-bottom: 20px;
+        }
         .map-card {
             background-color: #0b0b0b;
             border: 1px solid #1a0000;
@@ -194,18 +194,58 @@
             padding: 15px;
             margin-bottom: 20px;
         }
-        .chat-intro {
-            color: #CCC;
-            font-size: 0.9rem;
+        .chat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 12px;
         }
-        .chat-frame iframe {
-            display: block;
-            width: 100%;
-            height: 279px;
-            border: 1px solid #1a0000;
-            background-color: #0b0b0b;
+        .chat-intro { color: #CCC; font-size: 0.9rem; margin: 0; }
+        .chat-btn {
+            background: transparent;
+            color: #FF4500;
+            border: 1px solid #880000;
+            font-family: 'MyCustomFont', sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 6px 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.15s ease-in-out;
         }
+        .chat-btn:hover { color: #ffffff; border-color: #ff0000; }
+        .chat-messages {
+            height: 260px;
+            overflow-y: auto;
+            background-color: #000000;
+            border: 1px solid #1a0000;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        .chat-messages::-webkit-scrollbar { width: 8px; }
+        .chat-messages::-webkit-scrollbar-track { background: #000000; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb:hover { background: #ff0000; }
+        .chat-msg { margin-bottom: 10px; color: #CCC; line-height: 1.4; overflow-wrap: anywhere; }
+        .chat-name { color: #ff0000; font-family: 'MyCustomFont', sans-serif; font-weight: bold; font-size: 0.8rem; }
+        .chat-time { color: #666; font-size: 0.7rem; margin-left: 8px; }
+        .chat-empty { color: #666; text-align: center; padding-top: 20px; }
+        .chat-form { display: flex; gap: 8px; flex-wrap: wrap; }
+        .chat-form input {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #880000;
+            padding: 8px 10px;
+            font-family: Tahoma, Geneva, sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .chat-form input:focus { border-color: #ff0000; }
+        #chat-name { width: 130px; }
+        #chat-text { flex: 1; min-width: 150px; }
+        .chat-status { color: #888; font-size: 0.75rem; margin-top: 8px; min-height: 1.2em; }
         .chat-placeholder {
             border: 1px dashed #880000;
             padding: 30px 15px;
@@ -221,7 +261,7 @@
             main { padding: 20px; height: auto; }
             .scroll-box { overflow-y: visible; padding-right: 0; }
             .project-grid { grid-template-columns: 1fr; }
-            .chat-frame iframe { height: 380px; }
+            .chat-messages { height: 240px; }
         }
     </style>
 </head>
@@ -273,10 +313,7 @@
                         <div class="map-card">
                             <a href="Images/HL2_Lockdown_DM_QCDE.png" target="_blank"><img src="Images/HL2_Lockdown_DM_QCDE.png" alt="HL2 Lockdown Dev Preview"></a>
                             <div class="map-title">Half-Life 2 Lockdown Remake</div>
-                            <div class="map-desc">
-                              <p>I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. </p>
-                              <p>It's getting there!</p>
-                            </div>
+                            <div class="map-desc">I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. It's getting there!</div>
                         </div>
                     </div>
                 </section>
@@ -284,8 +321,17 @@
                 <section class="chat">
                     <h2 class="category-title">Chat</h2>
                     <div class="chat-frame">
-                        <p class="chat-intro"></p>
-                        <div id="cbox-holder"></div>
+                        <div class="chat-top">
+                            <p class="chat-intro"></p>
+                            <button type="button" id="chat-mute" class="chat-btn">Sound: On</button>
+                        </div>
+                        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+                        <form id="chat-form" class="chat-form" autocomplete="off">
+                            <input id="chat-name" type="text" maxlength="20" placeholder="Name" required>
+                            <input id="chat-text" type="text" maxlength="300" placeholder="Message" required>
+                            <button type="submit" class="chat-btn">Send</button>
+                        </form>
+                        <div id="chat-status" class="chat-status"></div>
                     </div>
                 </section>
 
@@ -298,21 +344,142 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
+        /* ======================================================================
+           CHAT SETUP: replace each PASTE... value below with your own Firebase
+           values (Project settings > Your apps > Web app > Config).
+           databaseURL comes from Build > Realtime Database.
+           Leave them as-is and the page shows "Chat coming soon" instead.
+           ====================================================================== */
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmtFU6spppxSwTRWiqs7bXTnOsa-GlG0I",
+            authDomain: "dcx-lobby.firebaseapp.com",
+            databaseURL: "https://dcx-lobby-default-rtdb.firebaseio.com",
+            projectId: "dcx-lobby",
+            appId: "1:1097758404471:web:df4ae2fce0fd0b9c1c3b72"
+        };
 
-        const CBOX_SRC = "https://www3.cbox.ws/box/?boxid=3561691&boxtag=8K4QvR";
+        const SOUND_FILE = "pop.wav";   // put pop.wav in the same folder as index.html
+        const MAX_MESSAGES = 50;        // how many recent messages to show
+        const COOLDOWN_MS = 3000;       // minimum time between a visitor's messages
 
-        const holder = document.getElementById("cbox-holder");
-        if (CBOX_SRC) {
-            const frame = document.createElement("iframe");
-            frame.src = CBOX_SRC;
-            frame.title = "Megasphere chat";
-            frame.loading = "lazy";
-            frame.setAttribute("frameborder", "3");
-            frame.setAttribute("allow", "autoplay");
-            holder.appendChild(frame);
+        const frame = document.querySelector(".chat-frame");
+
+        function store(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+        function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+        async function startChat() {
+            const V = "10.14.1";
+            const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+            const { getDatabase, ref, push, query, limitToLast, onValue, serverTimestamp } =
+                await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
+
+            const db = getDatabase(initializeApp(firebaseConfig));
+            const messagesRef = ref(db, "messages");
+
+            const box = document.getElementById("chat-messages");
+            const form = document.getElementById("chat-form");
+            const nameIn = document.getElementById("chat-name");
+            const textIn = document.getElementById("chat-text");
+            const muteBtn = document.getElementById("chat-mute");
+            const status = document.getElementById("chat-status");
+
+            nameIn.value = load("chatName") || "";
+
+            /* Sound */
+            const pop = new Audio(SOUND_FILE);
+            pop.volume = 0.5;
+            let muted = load("chatMuted") === "1";
+            function updateMute() { muteBtn.textContent = muted ? "Sound: Off" : "Sound: On"; }
+            updateMute();
+            muteBtn.addEventListener("click", () => {
+                muted = !muted;
+                store("chatMuted", muted ? "1" : "0");
+                updateMute();
+            });
+            function playPop() {
+                if (muted) return;
+                pop.currentTime = 0;
+                pop.play().catch(() => {}); // browsers block sound until the visitor has clicked/typed on the page
+            }
+
+            function formatTime(ts) {
+                const d = new Date(ts);
+                const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                return d.toDateString() === new Date().toDateString()
+                    ? time
+                    : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + time;
+            }
+
+            /* Show messages (textContent only, so nobody can inject HTML) */
+            let first = true;
+            let lastId = null;
+            const q = query(messagesRef, limitToLast(MAX_MESSAGES));
+            onValue(q, (snap) => {
+                const msgs = [];
+                snap.forEach((child) => { msgs.push({ id: child.key, ...child.val() }); });
+
+                const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+                box.textContent = "";
+                if (!msgs.length) {
+                    const empty = document.createElement("div");
+                    empty.className = "chat-empty";
+                    empty.textContent = "No messages yet. Be the first!";
+                    box.appendChild(empty);
+                }
+                msgs.forEach((m) => {
+                    const row = document.createElement("div");
+                    row.className = "chat-msg";
+                    const name = document.createElement("span");
+                    name.className = "chat-name";
+                    name.textContent = m.name;
+                    const time = document.createElement("span");
+                    time.className = "chat-time";
+                    time.textContent = m.ts ? formatTime(m.ts) : "";
+                    const text = document.createElement("div");
+                    text.textContent = m.text;
+                    row.append(name, time, text);
+                    box.appendChild(row);
+                });
+                if (first || nearBottom) box.scrollTop = box.scrollHeight;
+
+                const newestId = msgs.length ? msgs[msgs.length - 1].id : null;
+                if (!first && newestId && newestId !== lastId) playPop();
+                lastId = newestId;
+                first = false;
+            }, () => {
+                status.textContent = "Couldn't load the chat right now.";
+            });
+
+            /* Send */
+            let lastSent = 0;
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const name = nameIn.value.trim().slice(0, 20);
+                const text = textIn.value.trim().slice(0, 300);
+                if (!name || !text) return;
+                if (Date.now() - lastSent < COOLDOWN_MS) {
+                    status.textContent = "Slow down a sec...";
+                    return;
+                }
+                lastSent = Date.now();
+                try {
+                    await push(messagesRef, { name, text, ts: serverTimestamp() });
+                    textIn.value = "";
+                    store("chatName", name);
+                    status.textContent = "";
+                } catch (err) {
+                    status.textContent = "Couldn't send your message. Please try again.";
+                }
+            });
+        }
+
+        if (JSON.stringify(firebaseConfig).includes("PASTE")) {
+            frame.innerHTML = '<div class="chat-placeholder">Chat coming soon</div>';
         } else {
-            holder.innerHTML = '<div class="chat-placeholder">Chat coming soon</div>';
+            startChat().catch(() => {
+                frame.innerHTML = '<div class="chat-placeholder">Chat is unavailable right now</div>';
+            });
         }
     </script>
 
