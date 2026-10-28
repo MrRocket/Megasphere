@@ -224,13 +224,20 @@
             transition: all 0.15s ease-in-out;
         }
         .chat-btn:hover { color: #ffffff; border-color: #ff0000; }
-        .chat-messages {
+        .chat-main {
+            display: flex;
+            gap: 12px;
             height: 160px;
+            margin-bottom: 12px;
+        }
+        .chat-messages {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
             overflow-y: auto;
             background-color: #000000;
             border: 1px solid #1a0000;
             padding: 10px;
-            margin-bottom: 12px;
             font-size: 0.9rem;
         }
         .chat-messages::-webkit-scrollbar { width: 8px; }
@@ -269,18 +276,24 @@
 
         /* Online users */
         .chat-users {
+            width: 130px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto;
             background-color: #000000;
             border: 1px solid #1a0000;
             padding: 8px;
-            margin-bottom: 12px;
             font-size: 0.8rem;
         }
+        .chat-users::-webkit-scrollbar { width: 8px; }
+        .chat-users::-webkit-scrollbar-track { background: #000000; }
+        .chat-users::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
         .chat-users-title {
             color: #ff0000;
             font-family: 'MyCustomFont', sans-serif;
             margin-bottom: 6px;
         }
-        #chat-users-list { color: #CCC; }
+        #chat-users-list { color: #CCC; overflow-wrap: anywhere; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
@@ -288,7 +301,8 @@
             main { padding: 20px; height: auto; }
             .scroll-box { overflow-y: visible; padding-right: 0; }
             .project-grid { grid-template-columns: 1fr; }
-            .chat-messages { height: 240px; }
+            .chat-main { height: 240px; }
+            .chat-users { width: 110px; }
         }
     </style>
 </head>
@@ -358,12 +372,13 @@
                             </div>
                         </div>
 
-                        <div id="chat-users" class="chat-users">
-                            <div class="chat-users-title">Online Users</div>
-                            <div id="chat-users-list">Sign in to see who's online</div>
+                        <div class="chat-main">
+                            <div id="chat-users" class="chat-users">
+                                <div class="chat-users-title">Online Users</div>
+                                <div id="chat-users-list">Sign in to see who's online</div>
+                            </div>
+                            <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
                         </div>
-
-                        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
 
                         <form id="chat-form" class="chat-form" autocomplete="off">
                             <input id="chat-name" type="text" maxlength="20" placeholder="Name" required>
@@ -431,7 +446,7 @@
                Anyone whose heartbeat is older than STALE_MS is hidden from the list, so
                people who close a phone tab (where Firebase can't tell they left) drop off. */
             const HEARTBEAT_MS = 30000;   // how often we say "I'm still here"
-            const STALE_MS = 100000;      // hide people we haven't heard from for 2 minutes
+            const STALE_MS = 120000;      // hide people we haven't heard from for 2 minutes
             const PRUNE_MS = 300000;      // delete entries nobody has refreshed for 5 minutes
 
             let serverOffset = 0;         // difference between this device's clock and Firebase's
