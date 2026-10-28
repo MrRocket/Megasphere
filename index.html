@@ -27,25 +27,23 @@
         }
 
         /* Sidebar Navigation Menu */
-nav {
-    width: 250px;
-    background:
-        linear-gradient(
-            rgba(0,0,0,0.50),
-            rgba(0,0,0,0.50)
-        ),
-        url('Images/fire.gif');
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    border-right: 2px solid #880000;
-    padding: 20px;
-    flex-shrink: 0;
-    height: 100%;
-    overflow-y: auto;
-}
+        nav {
+            width: 250px;
+            background:
+                linear-gradient(
+                    rgba(0,0,0,0.50),
+                    rgba(0,0,0,0.50)
+                ),
+                url('Images/fire.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-right: 2px solid #880000;
+            padding: 20px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto;
+        }
         nav ul { list-style: none; }
         nav ul li { margin-bottom: 15px; }
         nav ul li a {
@@ -211,6 +209,7 @@ nav {
             gap: 10px;
             margin-bottom: 12px;
         }
+        .chat-buttons { display: flex; gap: 8px; }
         .chat-intro { color: #777; font-size: 0.75rem; margin: 0; }
         .chat-btn {
             background: transparent;
@@ -239,6 +238,8 @@ nav {
         .chat-messages::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
         .chat-messages::-webkit-scrollbar-thumb:hover { background: #ff0000; }
         .chat-msg { margin-bottom: 10px; color: #CCC; line-height: 1.4; overflow-wrap: anywhere; }
+        .chat-msg a { color: #FF4500; text-decoration: underline; }
+        .chat-msg a:hover { color: #FFFFFF; }
         .chat-name { color: #ff0000; font-family: 'MyCustomFont', sans-serif; font-weight: bold; font-size: 0.8rem; }
         .chat-time { color: #666; font-size: 0.7rem; margin-left: 8px; }
         .chat-empty { color: #666; text-align: center; padding-top: 20px; }
@@ -264,36 +265,22 @@ nav {
             color: #888;
             font-family: 'MyCustomFont', sans-serif;
             font-size: 0.85rem;
-			
-			
         }
-		
-				.chat-msg a {
-			color: #FF4500;
-			text-decoration: underline;
-		}
-		
-		.chat-msg a:hover {
-			color: #FFFFFF;
-		}
-		
-				.chat-users {
-			background-color: #000000;
-			border: 1px solid #1a0000;
-			padding: 8px;
-			margin-bottom: 12px;
-			font-size: 0.8rem;
-		}
-		
-		.chat-users-title {
-			color: #ff0000;
-			font-family: 'MyCustomFont', sans-serif;
-			margin-bottom: 6px;
-		}
-		
-		#chat-users-list {
-			color: #CCC;
-		}
+
+        /* Online users */
+        .chat-users {
+            background-color: #000000;
+            border: 1px solid #1a0000;
+            padding: 8px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+        }
+        .chat-users-title {
+            color: #ff0000;
+            font-family: 'MyCustomFont', sans-serif;
+            margin-bottom: 6px;
+        }
+        #chat-users-list { color: #CCC; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
@@ -361,33 +348,23 @@ nav {
                 <section class="chat">
                     <h2 class="category-title">Chat</h2>
                     <div class="chat-frame">
-                    <div class="chat-top">
-    <p class="chat-intro">
-    Sign in with Google to reserve your username permanently.
-</p>
 
-    <div style="display:flex;gap:8px;">
-        <button type="button" id="chat-login" class="chat-btn">
-            Login
-        </button>
-
-        <button type="button" id="chat-logout" class="chat-btn">
-            Logout
-        </button>
-
-        <button type="button" id="chat-mute" class="chat-btn">
-            Sound: On
-        </button>
-    </div>
-</div>
-
+                        <div class="chat-top">
+                            <p class="chat-intro">Sign in with Google to reserve your username permanently.</p>
+                            <div class="chat-buttons">
+                                <button type="button" id="chat-login" class="chat-btn">Login</button>
+                                <button type="button" id="chat-logout" class="chat-btn">Logout</button>
+                                <button type="button" id="chat-mute" class="chat-btn">Sound: On</button>
+                            </div>
+                        </div>
 
                         <div id="chat-users" class="chat-users">
-                        <div class="chat-users-title">Online Users</div>
-                        <div id="chat-users-list">Nobody online</div>
-                    </div>
-                    
-                    <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+                            <div class="chat-users-title">Online Users</div>
+                            <div id="chat-users-list">Sign in to see who's online</div>
+                        </div>
+
+                        <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+
                         <form id="chat-form" class="chat-form" autocomplete="off">
                             <input id="chat-name" type="text" maxlength="20" placeholder="Name" required>
                             <input id="chat-text" type="text" maxlength="300" placeholder="Message" required>
@@ -431,35 +408,16 @@ nav {
         async function startChat() {
             const V = "10.14.1";
             const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
-           const {
-    getAuth,
-    GoogleAuthProvider,
-    signInWithPopup,
-    signOut,
-    onAuthStateChanged
-} = await import(
-    `https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`
-);
-           const {
-					getDatabase,
-					ref,
-					push,
-					set,
-					get,
-					query,
-					limitToLast,
-					onValue,
-					serverTimestamp,
-					onDisconnect,
-					remove
-				} = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
+            const { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } =
+                await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+            const { getDatabase, ref, push, set, get, query, limitToLast, onValue, serverTimestamp, onDisconnect, remove } =
+                await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
 
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getDatabase(app);
             const messagesRef = ref(db, "messages");
-			const presenceRef = ref(db, "presence");
-
+            const presenceRef = ref(db, "presence");
 
             const box = document.getElementById("chat-messages");
             const form = document.getElementById("chat-form");
@@ -467,31 +425,53 @@ nav {
             const textIn = document.getElementById("chat-text");
             const muteBtn = document.getElementById("chat-mute");
             const status = document.getElementById("chat-status");
-			
-			const usersList = document.getElementById("chat-users-list");
+            const usersList = document.getElementById("chat-users-list");
 
-onValue(presenceRef, (snap) => {
+            /* Online users: the list only starts after sign-in, and stops on logout */
+            let stopPresenceListener = null;
 
-    console.log("PRESENCE UPDATE", snap.val());
+            function startPresenceListener() {
+                if (stopPresenceListener) return; // already listening
+                stopPresenceListener = onValue(presenceRef, (snap) => {
+                    const users = [];
+                    snap.forEach((child) => {
+                        const data = child.val();
+                        if (data && typeof data.name === "string" && data.name) users.push(data.name);
+                    });
+                    users.sort((a, b) => a.localeCompare(b));
 
-    const users = [];
+                    usersList.textContent = "";
+                    if (!users.length) {
+                        usersList.textContent = "Nobody online";
+                        return;
+                    }
+                    users.forEach((name) => {
+                        const line = document.createElement("div");
+                        line.textContent = name;
+                        usersList.appendChild(line);
+                    });
+                }, (err) => {
+                    console.error("Presence list failed:", err);
+                    stopPresenceListener = null;
+                    usersList.textContent = "Online list unavailable";
+                });
+            }
 
-    snap.forEach((child) => {
+            function stopPresence() {
+                if (stopPresenceListener) { stopPresenceListener(); stopPresenceListener = null; }
+                usersList.textContent = "Sign in to see who's online";
+            }
 
-        const data = child.val();
-
-        if (data && data.name) {
-            users.push(data.name);
-        }
-    });
-
-    users.sort((a, b) => a.localeCompare(b));
-
-    usersList.innerHTML =
-        users.length > 0
-            ? users.join("<br>")
-            : "Nobody online";
-});
+            /* Mark this user as online (and offline again when they leave) */
+            async function announcePresence() {
+                try {
+                    const myPresenceRef = ref(db, "presence/" + uid);
+                    onDisconnect(myPresenceRef).remove();
+                    await set(myPresenceRef, { uid: uid, name: myName });
+                } catch (err) {
+                    console.error("Presence write failed:", err);
+                }
+            }
 
             /* Sound */
             const pop = new Audio(SOUND_FILE);
@@ -517,44 +497,35 @@ onValue(presenceRef, (snap) => {
                     ? time
                     : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + time;
             }
-			
-			
-			
 
-            /* Show messages (also inject HTML links) */
-			
-			function createMessageContent(message) {
-    const container = document.createElement("div");
+            /* Turn http(s) links in a message into clickable links (built as DOM nodes, never raw HTML) */
+            function createMessageContent(message) {
+                const container = document.createElement("div");
+                const urlRegex = /(https?:\/\/[^\s]+)/gi;
+                let lastIndex = 0;
+                let match;
 
-    const urlRegex = /(https?:\/\/[^\s]+)/gi;
+                while ((match = urlRegex.exec(message)) !== null) {
+                    const before = message.substring(lastIndex, match.index);
+                    if (before) container.appendChild(document.createTextNode(before));
 
-    let lastIndex = 0;
-    let match;
+                    const a = document.createElement("a");
+                    a.href = match[0];
+                    a.textContent = match[0];
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+                    container.appendChild(a);
 
-    while ((match = urlRegex.exec(message)) !== null) {
+                    lastIndex = match.index + match[0].length;
+                }
 
-        const before = message.substring(lastIndex, match.index);
-        if (before)
-            container.appendChild(document.createTextNode(before));
+                const remainder = message.substring(lastIndex);
+                if (remainder) container.appendChild(document.createTextNode(remainder));
 
-        const a = document.createElement("a");
-        a.href = match[0];
-        a.textContent = match[0];
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
+                return container;
+            }
 
-        container.appendChild(a);
-
-        lastIndex = match.index + match[0].length;
-    }
-
-    const remainder = message.substring(lastIndex);
-    if (remainder)
-        container.appendChild(document.createTextNode(remainder));
-
-    return container;
-}
-			
+            /* Show messages */
             let first = true;
             let lastId = null;
             const q = query(messagesRef, limitToLast(MAX_MESSAGES));
@@ -579,7 +550,7 @@ onValue(presenceRef, (snap) => {
                     const time = document.createElement("span");
                     time.className = "chat-time";
                     time.textContent = m.ts ? formatTime(m.ts) : "";
-					const text = createMessageContent(m.text);
+                    const text = createMessageContent(String(m.text || ""));
                     row.append(name, time, text);
                     box.appendChild(row);
                 });
@@ -593,12 +564,12 @@ onValue(presenceRef, (snap) => {
                 status.textContent = "Couldn't load the chat right now.";
             });
 
-            /* Identity: each browser gets a private anonymous ID, and a name
-               can be claimed once. The rules in Firebase enforce this. */
+            /* Identity: Google sign-in gives each person a permanent ID, and a
+               username can be claimed once. The rules in Firebase enforce this. */
             let uid = null;
             let myName = null;
             let ready = false;
-            const HINT = "Your name is locked to this browser after your first message.";
+            const HINT = "Your username is locked to your Google account after your first message.";
 
             function lockName(name) {
                 myName = name;
@@ -607,91 +578,72 @@ onValue(presenceRef, (snap) => {
                 status.textContent = "";
             }
 
-           const provider = new GoogleAuthProvider();
+            const provider = new GoogleAuthProvider();
+            const loginBtn = document.getElementById("chat-login");
+            const logoutBtn = document.getElementById("chat-logout");
 
-const loginBtn = document.getElementById("chat-login");
-const logoutBtn = document.getElementById("chat-logout");
+            status.textContent = "Please sign in.";
 
-status.textContent = "Please sign in.";
+            loginBtn.addEventListener("click", async () => {
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (err) {
+                    console.error(err);
+                    status.textContent = "Login failed.";
+                }
+            });
 
-loginBtn.addEventListener("click", async () => {
-    try {
-        await signInWithPopup(auth, provider);
-    }
-    catch (err) {
-        console.error(err);
-        status.textContent = "Login failed.";
-    }
-});
+            logoutBtn.addEventListener("click", async () => {
+                try {
+                    if (uid) await remove(ref(db, "presence/" + uid)); // go offline right away
+                } catch (err) {
+                    console.error(err);
+                }
+                try {
+                    await signOut(auth);
+                } catch (err) {
+                    console.error(err);
+                }
+            });
 
-logoutBtn.addEventListener("click", async () => {
-    try {
-        await signOut(auth);
-    }
-    catch (err) {
-        console.error(err);
-    }
-});
+            onAuthStateChanged(auth, async (user) => {
 
-onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    stopPresence();
+                    uid = null;
+                    myName = null;
+                    ready = false;
+                    nameIn.readOnly = false;
+                    nameIn.value = "";
+                    status.textContent = "Please sign in.";
+                    return;
+                }
 
-    if (!user) {
-        uid = null;
-        myName = null;
-        ready = false;
+                uid = user.uid;
+                startPresenceListener();
 
-        nameIn.readOnly = false;
-        nameIn.value = "";
+                try {
+                    const snap = await get(ref(db, "users/" + uid));
+                    if (snap.exists()) {
+                        lockName(snap.val());
+                        await announcePresence();
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
 
-        status.textContent = "Please sign in.";
-
-        return;
-    }
-
-
-
-
-    uid = user.uid;
-	const myPresenceRef = ref(db, "presence/" + uid);
-	
-	await set(myPresenceRef, {
-		uid: uid,
-		name: user.displayName || "Unknown"
-	});
-	
-	onDisconnect(myPresenceRef).remove();
-		try {
-			const snap = await get(ref(db, "users/" + uid));
-	
-			if (snap.exists()) {
-				lockName(snap.val());
-				await set(myPresenceRef, {
-					uid: uid,
-					name: snap.val()
-				});
-			}
-		}
-		catch (err) {
-			console.error(err);
-		}
-	
-		ready = true;
-	
-		if (!myName)
-			status.textContent = HINT;
-		else
-			status.textContent = "";
-	});
+                ready = true;
+                status.textContent = myName ? "" : HINT;
+            });
 
             /* Send */
             let lastSent = 0;
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
-              if (!auth.currentUser) {
-    status.textContent =
-        "Please sign in with Google first.";
-    return;
-}
+                if (!auth.currentUser || !ready) {
+                    status.textContent = "Please sign in with Google first.";
+                    return;
+                }
                 const text = textIn.value.trim().slice(0, 300);
                 if (!text) return;
                 if (Date.now() - lastSent < COOLDOWN_MS) {
@@ -714,6 +666,7 @@ onAuthStateChanged(auth, async (user) => {
                         status.textContent = "That name is taken or not allowed. Try another.";
                         return;
                     }
+                    await announcePresence(); // new users show up as online too
                 }
 
                 lastSent = Date.now();
