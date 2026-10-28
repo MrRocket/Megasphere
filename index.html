@@ -427,29 +427,53 @@
             const status = document.getElementById("chat-status");
             const usersList = document.getElementById("chat-users-list");
 
-            /* Online users: the list only starts after sign-in, and stops on logout */
+            /* Online users. Each signed-in browser sends a "heartbeat" every 30 seconds.
+               Anyone whose heartbeat is older than STALE_MS is hidden from the list, so
+               people who close a phone tab (where Firebase can't tell they left) drop off. */
+            const HEARTBEAT_MS = 30000;   // how often we say "I'm still here"
+            const STALE_MS = 100000;      // hide people we haven't heard from for 2 minutes
+            const PRUNE_MS = 300000;      // delete entries nobody has refreshed for 5 minutes
+
+            let serverOffset = 0;         // difference between this device's clock and Firebase's
+            onValue(ref(db, ".info/serverTimeOffset"), (s) => { serverOffset = s.val() || 0; });
+
+            let presenceData = [];
             let stopPresenceListener = null;
+
+            function renderPresence() {
+                const now = Date.now() + serverOffset;
+                const names = presenceData
+                    .filter((p) => typeof p.lastSeen === "number" && now - p.lastSeen < STALE_MS)
+                    .map((p) => p.name)
+                    .sort((a, b) => a.localeCompare(b));
+
+                usersList.textContent = "";
+                if (!names.length) {
+                    usersList.textContent = "Nobody online";
+                    return;
+                }
+                names.forEach((name) => {
+                    const line = document.createElement("div");
+                    line.textContent = name;
+                    usersList.appendChild(line);
+                });
+            }
 
             function startPresenceListener() {
                 if (stopPresenceListener) return; // already listening
                 stopPresenceListener = onValue(presenceRef, (snap) => {
-                    const users = [];
+                    presenceData = [];
+                    const now = Date.now() + serverOffset;
                     snap.forEach((child) => {
-                        const data = child.val();
-                        if (data && typeof data.name === "string" && data.name) users.push(data.name);
+                        const d = child.val();
+                        if (!d || typeof d.name !== "string" || !d.name) return;
+                        presenceData.push({ key: child.key, name: d.name, lastSeen: d.lastSeen });
+                        // tidy up entries left behind by closed phone tabs
+                        if (typeof d.lastSeen === "number" && now - d.lastSeen > PRUNE_MS) {
+                            remove(ref(db, "presence/" + child.key)).catch(() => {});
+                        }
                     });
-                    users.sort((a, b) => a.localeCompare(b));
-
-                    usersList.textContent = "";
-                    if (!users.length) {
-                        usersList.textContent = "Nobody online";
-                        return;
-                    }
-                    users.forEach((name) => {
-                        const line = document.createElement("div");
-                        line.textContent = name;
-                        usersList.appendChild(line);
-                    });
+                    renderPresence();
                 }, (err) => {
                     console.error("Presence list failed:", err);
                     stopPresenceListener = null;
@@ -459,19 +483,33 @@
 
             function stopPresence() {
                 if (stopPresenceListener) { stopPresenceListener(); stopPresenceListener = null; }
+                presenceData = [];
                 usersList.textContent = "Sign in to see who's online";
             }
 
-            /* Mark this user as online (and offline again when they leave) */
+            /* Mark this user as online (and offline again if the connection drops cleanly) */
             async function announcePresence() {
+                if (!uid || !myName) return;
                 try {
                     const myPresenceRef = ref(db, "presence/" + uid);
                     onDisconnect(myPresenceRef).remove();
-                    await set(myPresenceRef, { uid: uid, name: myName });
+                    await set(myPresenceRef, { uid: uid, name: myName, lastSeen: serverTimestamp() });
                 } catch (err) {
                     console.error("Presence write failed:", err);
                 }
             }
+
+            // Heartbeat, plus re-announce when the connection comes back or the tab is shown again
+            setInterval(() => { if (stopPresenceListener) renderPresence(); }, 15000);
+            setInterval(announcePresence, HEARTBEAT_MS);
+            onValue(ref(db, ".info/connected"), (s) => { if (s.val() === true) announcePresence(); });
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") announcePresence();
+            });
+            window.addEventListener("pageshow", (e) => { if (e.persisted) announcePresence(); });
+            window.addEventListener("pagehide", () => {
+                if (uid && myName) remove(ref(db, "presence/" + uid)).catch(() => {});
+            });
 
             /* Sound */
             const pop = new Audio(SOUND_FILE);
