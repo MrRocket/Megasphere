@@ -1,0 +1,36 @@
+name: Update server list
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # about every 10 minutes (GitHub may run it a little late)
+  workflow_dispatch:          # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch the server lists
+        run: python scripts/fetch_servers.py
+
+      - name: Publish servers.json to the data branch
+        run: |
+          mkdir /tmp/out
+          cp servers.json /tmp/out/servers.json
+          cd /tmp/out
+          git init -q
+          git checkout -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add servers.json
+          git commit -q -m "Update server list"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push -f origin data
