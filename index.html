@@ -297,6 +297,82 @@
         }
         #chat-users-list { color: #CCC; overflow-wrap: anywhere; }
 
+        /* Server browser */
+        .servers-frame {
+            max-width: 610px;
+            background-color: #0b0b0b;
+            border: 1px solid #880000;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .servers-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .servers-filters {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #CCC;
+            font-size: 0.8rem;
+        }
+        .servers-filters label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .servers-filters select {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #880000;
+            padding: 3px 6px;
+            font-family: Tahoma, Geneva, sans-serif;
+            font-size: 0.8rem;
+        }
+        .servers-meta { color: #777; font-size: 0.75rem; margin-bottom: 8px; }
+        .servers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .servers-list::-webkit-scrollbar { width: 8px; }
+        .servers-list::-webkit-scrollbar-track { background: #000000; }
+        .servers-list::-webkit-scrollbar-thumb { background: #880000; border-radius: 4px; }
+        .servers-list::-webkit-scrollbar-thumb:hover { background: #ff0000; }
+        .servers-empty { color: #666; text-align: center; padding: 16px 0; font-size: 0.85rem; }
+        .servers-credit { color: #666; font-size: 0.7rem; margin-top: 10px; text-align: right; }
+        .servers-credit a { color: #FF4500; }
+        .server-row { background-color: #000000; border: 1px solid #1a0000; }
+        .server-row[open] { border-color: #880000; }
+        .server-row summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            list-style: none;
+        }
+        .server-row summary::-webkit-details-marker { display: none; }
+        .server-row summary:hover .server-name { color: #FF4500; }
+        .server-main { min-width: 0; }
+        .server-name { color: #ffffff; font-family: 'MyCustomFont', sans-serif; font-size: 0.85rem; overflow-wrap: anywhere; }
+        .server-sub { color: #999; font-size: 0.75rem; overflow-wrap: anywhere; }
+        .server-count { color: #FF4500; font-family: 'MyCustomFont', sans-serif; font-size: 0.8rem; white-space: nowrap; text-align: right; }
+        .server-tag {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 0 6px;
+            border: 1px solid #880000;
+            color: #FF4500;
+            font-family: Tahoma, Geneva, sans-serif;
+            font-size: 0.65rem;
+        }
+        .server-body { padding: 8px 10px 10px; border-top: 1px dashed #1a0000; color: #CCC; font-size: 0.8rem; }
+        .server-line { margin-bottom: 6px; overflow-wrap: anywhere; }
+        .server-label { color: #ff0000; font-family: 'MyCustomFont', sans-serif; font-size: 0.7rem; margin-right: 6px; }
+        .server-body a { color: #FF4500; text-decoration: underline; }
+        .server-body a:hover { color: #ffffff; }
+        .server-body .chat-btn { margin-left: 8px; padding: 3px 8px; }
+
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
             nav { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #880000; }
@@ -358,6 +434,33 @@
                             <div class="map-title">Half-Life 2 Lockdown Remake</div>
                             <div class="map-desc">I'm currently working on a remake of the Half-Life 2 Lockdown DM map for QCDE. It's getting there!</div>
                         </div>
+                    </div>
+                </section>
+
+                <section class="servers">
+                    <h2 class="category-title">Servers</h2>
+                    <div class="servers-frame">
+
+                        <div class="servers-top">
+                            <p class="chat-intro">Live Zandronum and Q-Zandronum servers. Click a server for details.</p>
+                            <button type="button" id="servers-refresh" class="chat-btn">Refresh</button>
+                        </div>
+
+                        <div class="servers-filters">
+                            <label>Engine
+                                <select id="servers-engine">
+                                    <option value="all">All</option>
+                                    <option value="zandronum">Zandronum</option>
+                                    <option value="qzandronum">Q-Zandronum</option>
+                                </select>
+                            </label>
+                            <label><input type="checkbox" id="servers-empty"> Include empty servers</label>
+                            <label><input type="checkbox" id="servers-qcde"> QC:DE only</label>
+                        </div>
+
+                        <div id="servers-meta" class="servers-meta">Loading servers...</div>
+                        <div id="servers-list" class="servers-list"></div>
+                        <div class="servers-credit">Server data from <a href="https://doomlist.net/" target="_blank" rel="noopener">doomlist.net</a></div>
                     </div>
                 </section>
 
@@ -738,6 +841,314 @@
         startChat().catch(() => {
             frame.innerHTML = '<div class="chat-placeholder">Chat is unavailable right now</div>';
         });
+    </script>
+
+    <script>
+        /* Server browser. Reads the Zandronum and Q-Zandronum lists from doomlist.net.
+           If a live request is blocked or fails, it falls back to servers.json, a copy that a
+           scheduled GitHub Action keeps on the "data" branch of your repo. */
+        (function () {
+            var SOURCES = [
+                { engine: "zandronum",  url: "https://doomlist.net/api" },
+                { engine: "qzandronum", url: "https://q.doomlist.net/api" }
+            ];
+            var SNAPSHOT_URL = "https://raw.githubusercontent.com/MrRocket/Megasphere/data/servers.json";
+            var REFRESH_MS = 120000;     // auto-refresh every 2 minutes while the tab is visible
+            var MIN_GAP_MS = 8000;       // don't let Refresh be hammered
+            var LABELS = { zandronum: "Zandronum", qzandronum: "Q-Zandronum" };
+
+            var listEl = document.getElementById("servers-list");
+            var metaEl = document.getElementById("servers-meta");
+            var refreshBtn = document.getElementById("servers-refresh");
+            var engineSel = document.getElementById("servers-engine");
+            var emptyCb = document.getElementById("servers-empty");
+            var qcdeCb = document.getElementById("servers-qcde");
+            if (!listEl || !metaEl || !refreshBtn) return;
+
+            var all = [];
+            var openKeys = {};
+            var lastLoad = 0;
+
+            function mk(tag, cls, text) {
+                var e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text !== undefined) e.textContent = text;
+                return e;
+            }
+
+            /* Remove Zandronum colour codes and control characters from a name */
+            function clean(s) {
+                if (typeof s !== "string") return "";
+                return s.replace(/\x1c(\[[^\]]*\]|[\s\S])/g, "").replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, 200);
+            }
+
+            /* Reduce one raw doomlist entry to the fields we show (same shape as servers.json) */
+            function slim(e, engine) {
+                if (!e || typeof e.name !== "string") return null;
+                if (typeof e.addr !== "string" || typeof e.port !== "number") return null;
+
+                var allPwads = Array.isArray(e.pwads) ? e.pwads : [];
+                var pwads = [];
+                var qcde = false;
+                allPwads.forEach(function (w) {
+                    if (typeof w !== "string") return;
+                    if (/qcde/i.test(w)) qcde = true;
+                    if (pwads.length < 12) pwads.push(clean(w));
+                });
+
+                var players = [];
+                (Array.isArray(e.playerdata) ? e.playerdata : []).slice(0, 40).forEach(function (p) {
+                    if (!p || typeof p !== "object") return;
+                    var n = clean(p["plain-name"] || p.name || "");
+                    if (n) players.push({ n: n, bot: !!p.bot, spec: !!p.spec });
+                });
+
+                var gm = (e.gamemode && typeof e.gamemode === "object") ? clean(e.gamemode.name) : "";
+                var mod = clean(e.mod);
+                var mode = gm || mod || ((e.gametype && typeof e.gametype === "object") ? clean(e.gametype.gamemode) : "");
+                var bots = typeof e.numbots === "number" ? e.numbots : 0;
+                var humans = typeof e.numhumans === "number"
+                    ? e.numhumans
+                    : Math.max(0, (typeof e.numplayers === "number" ? e.numplayers : 0) - bots);
+                var max = typeof e.maxplayers === "number" ? e.maxplayers : (typeof e.maxclients === "number" ? e.maxclients : 0);
+                var url = (typeof e.url === "string" && /^https?:\/\//i.test(e.url)) ? e.url.slice(0, 300) : "";
+
+                return {
+                    engine: engine,
+                    name: clean(e.name) || (e.addr + ":" + e.port),
+                    addr: e.addr,
+                    port: e.port,
+                    mode: mode,
+                    mod: mod,
+                    map: clean(e.mapname),
+                    iwad: clean(e.iwad),
+                    humans: humans,
+                    bots: bots,
+                    specs: typeof e.numspec === "number" ? e.numspec : 0,
+                    max: max,
+                    password: !!(e.forcepassword || e.forcejoinpassword),
+                    version: clean(e.version),
+                    country: (e.location && typeof e.location === "object") ? clean(e.location.code) : "",
+                    url: url,
+                    pwads: pwads,
+                    npwads: allPwads.length,
+                    players: players,
+                    qcde: qcde
+                };
+            }
+
+            function fetchJson(url, ms) {
+                var ctl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+                var timer = setTimeout(function () { if (ctl) ctl.abort(); }, ms);
+                return fetch(url, ctl ? { signal: ctl.signal } : {}).then(function (r) {
+                    clearTimeout(timer);
+                    if (!r.ok) throw new Error("HTTP " + r.status);
+                    return r.json();
+                }, function (err) {
+                    clearTimeout(timer);
+                    throw err;
+                });
+            }
+
+            /* Live from doomlist.net first, then the saved copy for any list that failed */
+            function loadAll() {
+                return Promise.all(SOURCES.map(function (src) {
+                    return fetchJson(src.url, 8000).then(function (data) {
+                        var out = [];
+                        Object.keys(data || {}).forEach(function (k) {
+                            var v = slim(data[k], src.engine);
+                            if (v) out.push(v);
+                        });
+                        return { src: src, ok: true, snap: false, servers: out };
+                    }).catch(function () {
+                        return { src: src, ok: false, snap: false, servers: [] };
+                    });
+                })).then(function (results) {
+                    var failed = results.filter(function (r) { return !r.ok; });
+                    if (!failed.length) return { results: results, snapshot: null };
+                    return fetchJson(SNAPSHOT_URL, 8000).then(function (snap) {
+                        failed.forEach(function (r) {
+                            var st = snap && snap.sources && snap.sources[r.src.engine];
+                            if (st && st.ok === false) return;
+                            r.servers = (snap.servers || []).filter(function (s) { return s && s.engine === r.src.engine; });
+                            r.ok = true;
+                            r.snap = true;
+                        });
+                        return { results: results, snapshot: snap };
+                    }).catch(function () {
+                        return { results: results, snapshot: null };
+                    });
+                });
+            }
+
+            function copyText(text, button) {
+                function done() {
+                    var old = button.textContent;
+                    button.textContent = "Copied";
+                    setTimeout(function () { button.textContent = old; }, 1500);
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done, function () { window.prompt("Copy this address:", text); });
+                } else {
+                    window.prompt("Copy this address:", text);
+                }
+            }
+
+            function buildRow(s) {
+                var key = s.addr + ":" + s.port;
+                var d = mk("details", "server-row");
+                if (openKeys[key]) d.open = true;
+                d.addEventListener("toggle", function () {
+                    if (d.open) openKeys[key] = 1; else delete openKeys[key];
+                });
+
+                var sum = mk("summary");
+                var main = mk("div", "server-main");
+                var name = mk("div", "server-name", s.name);
+                name.appendChild(mk("span", "server-tag", LABELS[s.engine] || s.engine));
+                if (s.qcde) name.appendChild(mk("span", "server-tag", "QC:DE"));
+                if (s.password) name.appendChild(mk("span", "server-tag", "Password"));
+                main.appendChild(name);
+                var sub = [s.map, s.mode, s.iwad].filter(function (x) { return x; }).join("  |  ");
+                main.appendChild(mk("div", "server-sub", sub));
+                sum.appendChild(main);
+                sum.appendChild(mk("div", "server-count",
+                    s.humans + (s.max ? "/" + s.max : "") + (s.bots ? "  +" + s.bots + " bots" : "")));
+                d.appendChild(sum);
+
+                var body = mk("div", "server-body");
+
+                var addrLine = mk("div", "server-line");
+                addrLine.appendChild(mk("span", "server-label", "ADDRESS"));
+                addrLine.appendChild(document.createTextNode(key));
+                var copy = mk("button", "chat-btn", "Copy");
+                copy.type = "button";
+                copy.addEventListener("click", function () { copyText(key, copy); });
+                addrLine.appendChild(copy);
+                body.appendChild(addrLine);
+
+                var humansList = s.players.filter(function (p) { return !p.bot; });
+                var pl = mk("div", "server-line");
+                pl.appendChild(mk("span", "server-label", "PLAYERS"));
+                if (humansList.length) {
+                    pl.appendChild(document.createTextNode(humansList.map(function (p) {
+                        return p.n + (p.spec ? " (spectating)" : "");
+                    }).join(", ")));
+                } else {
+                    pl.appendChild(document.createTextNode("No human players right now"));
+                }
+                if (s.bots) pl.appendChild(document.createTextNode("  +" + s.bots + " bots"));
+                body.appendChild(pl);
+
+                var files = [s.iwad].concat(s.pwads.slice(0, 8)).filter(function (x) { return x; });
+                if (files.length) {
+                    var extra = s.npwads - Math.min(s.pwads.length, 8);
+                    var fl = mk("div", "server-line");
+                    fl.appendChild(mk("span", "server-label", "FILES"));
+                    fl.appendChild(document.createTextNode(files.join(", ") + (extra > 0 ? "  and " + extra + " more" : "")));
+                    body.appendChild(fl);
+                }
+
+                var vl = [];
+                if (s.mod && s.mod !== s.mode) vl.push("Mod: " + s.mod);
+                if (s.country) vl.push("Country: " + s.country);
+                if (s.version) vl.push(s.version);
+                if (vl.length) {
+                    var vline = mk("div", "server-line");
+                    vline.appendChild(mk("span", "server-label", "INFO"));
+                    vline.appendChild(document.createTextNode(vl.join("  |  ")));
+                    body.appendChild(vline);
+                }
+
+                if (typeof s.url === "string" && /^https?:\/\//i.test(s.url)) {
+                    var wl = mk("div", "server-line");
+                    wl.appendChild(mk("span", "server-label", "WEBSITE"));
+                    var a = mk("a", "", "Server page");
+                    a.href = s.url;
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+                    wl.appendChild(a);
+                    body.appendChild(wl);
+                }
+
+                d.appendChild(body);
+                return d;
+            }
+
+            function render() {
+                var eng = engineSel.value;
+                var rows = all.filter(function (s) {
+                    if (eng !== "all" && s.engine !== eng) return false;
+                    if (qcdeCb.checked && !s.qcde) return false;
+                    if (!emptyCb.checked && s.humans < 1) return false;
+                    return true;
+                }).sort(function (a, b) {
+                    return (b.humans - a.humans) || a.name.localeCompare(b.name);
+                });
+
+                listEl.textContent = "";
+                if (!rows.length) {
+                    listEl.appendChild(mk("div", "servers-empty",
+                        all.length ? "No servers match. Try ticking Include empty servers." : "No servers to show right now."));
+                    return;
+                }
+                rows.forEach(function (s) { listEl.appendChild(buildRow(s)); });
+            }
+
+            function timeOf(d) {
+                return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            }
+
+            function load() {
+                lastLoad = Date.now();
+                refreshBtn.disabled = true;
+                metaEl.textContent = "Loading servers...";
+                loadAll().then(function (res) {
+                    all = [];
+                    var notes = [];
+                    var usedSnap = false;
+                    if (!res.results.some(function (r) { return r.ok; })) {
+                        metaEl.textContent = "Couldn't reach the server lists right now. Try Refresh in a moment.";
+                        render();
+                        return;
+                    }
+                    res.results.forEach(function (r) {
+                        all = all.concat(r.servers);
+                        if (r.snap) usedSnap = true;
+                        if (!r.ok) notes.push((LABELS[r.src.engine] || r.src.engine) + " list unavailable");
+                    });
+                    var withPlayers = 0, people = 0;
+                    all.forEach(function (s) { if (s.humans > 0) { withPlayers++; people += s.humans; } });
+
+                    var parts = [withPlayers + " servers with players", people + " players online"];
+                    if (usedSnap && res.snapshot && res.snapshot.updated) {
+                        var t = new Date(res.snapshot.updated);
+                        parts.push("saved copy from " + (isNaN(t) ? "earlier" : timeOf(t)));
+                    } else {
+                        parts.push("updated " + timeOf(new Date()));
+                    }
+                    metaEl.textContent = parts.join("  |  ") + (notes.length ? "  |  " + notes.join(", ") : "");
+                    render();
+                }).catch(function () {
+                    metaEl.textContent = "Couldn't load the server lists right now.";
+                }).then(function () {
+                    refreshBtn.disabled = false;
+                });
+            }
+
+            refreshBtn.addEventListener("click", function () {
+                if (Date.now() - lastLoad < MIN_GAP_MS) return;
+                load();
+            });
+            engineSel.addEventListener("change", render);
+            emptyCb.addEventListener("change", render);
+            qcdeCb.addEventListener("change", render);
+            setInterval(function () {
+                if (document.visibilityState === "visible" && Date.now() - lastLoad >= REFRESH_MS) load();
+            }, 15000);
+
+            load();
+        })();
     </script>
 
 </body>
