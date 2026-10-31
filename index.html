@@ -27,45 +27,23 @@
         }
 
         /* Sidebar Navigation Menu */
-		nav {
-			width: 250px;
-			position: relative;
-			overflow: hidden;
-		
-			border-right: 2px solid #880000;
-			padding: 20px;
-			flex-shrink: 0;
-			height: 100%;
-		}
-		
-		.nav-fire {
-			position: absolute;
-			top: 0;
-			left: 0;
-		
-			width: 100%;
-			height: 100%;
-		
-			object-fit: cover;
-		
-			z-index: 0;
-		}
-		
-		nav::before {
-			content: "";
-		
-			position: absolute;
-			inset: 0;
-		
-			background: rgba(0,0,0,0.50);
-		
-			z-index: 1;
-		}
-		
-		nav > * {
-			position: relative;
-			z-index: 2;
-		}
+        nav {
+            width: 250px;
+            background:
+                linear-gradient(
+                    rgba(0,0,0,0.50),
+                    rgba(0,0,0,0.50)
+                ),
+                url('Images/fire.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-right: 2px solid #880000;
+            padding: 20px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto;
+        }
         nav ul { list-style: none; }
         nav ul li { margin-bottom: 15px; }
         nav ul li a {
@@ -130,10 +108,7 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 20px 15px 20px 20px;
-            background-color: #000000;   /* Black background */
-         
-            background-repeat: no-repeat, repeat-y;
-            background-size: 100% 100%, 100% 164px;   /* stretch across the panel, keep the lines crisp */
+            background-color: #000000;
             border: 1px solid #4a2000;
             display: flex;
             flex-direction: column;
@@ -184,10 +159,10 @@
             padding-bottom: 8px;
         }
         .project-grid {
-	display: grid;
-	grid-template-columns: 1fr;
-	max-width: 780px;
-	margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            max-width: 610px;
+            margin-bottom: 20px;
         }
         .map-card {
             background-color: #0b0b0b;
@@ -223,11 +198,11 @@
 
         /* Chat box */
         .chat-frame {
-	max-width: 780px;
-	background-color: #0b0b0b;
-	border: 1px solid #880000;
-	padding: 15px;
-	margin-bottom: 20px;
+            max-width: 610px;
+            background-color: #0b0b0b;
+            border: 1px solid #880000;
+            padding: 15px;
+            margin-bottom: 20px;
         }
         .chat-top {
             display: flex;
@@ -263,9 +238,6 @@
             height: 100%;
             overflow-y: auto;
             background-color: #000000;
-			
-            background-repeat: repeat;
-            background-size: auto;
             border: 1px solid #1a0000;
             padding: 10px;
             font-size: 0.9rem;
@@ -293,7 +265,7 @@
         .chat-form input:focus { border-color: #ff0000; }
         .chat-form input[readonly] { color: #ff0000; border-color: #1a0000; cursor: default; font-weight: bold; }
         #chat-name { width: 130px; }
-        #chat-text { flex: 1; min-width: 150px; margin-left: 4px; }
+        #chat-text { flex: 1; min-width: 150px; }
         .chat-status { color: #888; font-size: 0.75rem; margin-top: 8px; min-height: 1.2em; }
         .chat-placeholder {
             border: 1px dashed #880000;
@@ -311,7 +283,6 @@
             height: 100%;
             overflow-y: auto;
             background-color: #000000;
-
             border: 1px solid #1a0000;
             padding: 8px;
             font-size: 0.8rem;
@@ -341,9 +312,6 @@
 
     <!-- Sidebar Navigation -->
     <nav>
-     <video class="nav-fire" autoplay muted loop playsinline>
-        <source src="Images/fire.mp4" type="video/mp4">
-    </video>
         <ul>
             <li><a href="index.html" class="active">Main Page</a></li>
             <li><a href="maps.html">Doom Maps</a></li>
@@ -398,7 +366,7 @@
                     <div class="chat-frame">
 
                         <div class="chat-top">
-                            <p class="chat-intro">Sign in with Google to reserve your username.</p>
+                            <p class="chat-intro">Sign in with Google to reserve your username permanently.</p>
                             <div class="chat-buttons">
                                 <button type="button" id="chat-login" class="chat-btn">Login</button>
                                 <button type="button" id="chat-logout" class="chat-btn">Logout</button>
